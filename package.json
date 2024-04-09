@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "bech32": "^2.0.0",
+    "bs58": "^5.0.0",
+    "elliptic": "^6.5.5"
+  },
+  "type": "module"
+}
