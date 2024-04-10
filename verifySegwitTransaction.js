@@ -5,16 +5,11 @@ import {
   verifySignature,
 } from "./utils.js";
 
-export default function verifySegwitTransaction(
-  transaction,
-  input,
-  signature,
-  publicKey
-) {
+export default function verifySegwitTransaction(transaction, input, signatures, publicKeys) {
   const serializedTx = serializeSegwitTransaction(transaction, input);
   const doubleSHA256Final = sha256Double(serializedTx);
-  let signatures = [];
-  let publicKeys = [];
+  // let signatures = [];
+  // let publicKeys = [];
 
   const witness = input.witness;
   // for (let i = 0; i < witness.length - 1; i++) {
@@ -66,6 +61,16 @@ function serializeSegwitTransaction(transaction, input) {
   const nLocktime = serializeUInt32LE(transaction.locktime);
   const sighashType = Buffer.alloc(4);
   sighashType.writeUInt32LE(1, 0);
+  // console.log(version.toString("hex"));
+  // console.log(hashPrevout.toString("hex"));
+  // console.log(hashSequences.toString("hex"));
+  // console.log(outpoint.toString("hex"));
+  // console.log(scriptCode.toString("hex"));
+  // console.log(value.toString("hex"));
+  // console.log(nSequence.toString("hex"));
+  // console.log(hashOutput.toString("hex"));
+  // console.log(nLocktime.toString("hex"));
+  // console.log(sighashType.toString("hex"));
   return Buffer.concat([
     version,
     hashPrevout,
@@ -106,15 +111,13 @@ function hashPrevouts(transaction) {
 }
 
 function hashSequence(transaction, input) {
-  if (input.is_coinbase || input.prevout.scriptpubkey_type === "v0_p2wsh") {
-    return Buffer.alloc(32);
-  } else {
+
     const sequences = transaction.vin.map((input) =>
       serializeUInt32LE(input.sequence)
     );
     const buffer = Buffer.concat(sequences);
     return sha256Double(buffer);
-  }
+
 }
 
 function hashOutputs(transaction) {

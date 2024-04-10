@@ -23,7 +23,6 @@ export function isValidSignature(transaction, signatures, publicKeys) {
         publicKeys
       );
       if (!isValid) {
-        console.log(`Invalid signature in ${outerInput.txid}`);
         return false;
       }
       // console.log(`Valid signature in ${outerInput.txid}`);
@@ -45,7 +44,6 @@ export function isValidSignature(transaction, signatures, publicKeys) {
         publicKeys
       );
       if (!isValid) {
-        console.log(`Invalid signature in ${outerInput.txid}`);
         return false;
       }
       // console.log(`Valid signature in ${outerInput.txid}`);

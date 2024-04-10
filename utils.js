@@ -63,7 +63,6 @@ export function verifySignature(
     const publicKey = ec.keyFromPublic(publicKeyHex, "hex");
     const result = publicKey.verify(message, signature);
     if (!result) {
-      console.log("Invalid signature");
       return false;
     }
     return true;

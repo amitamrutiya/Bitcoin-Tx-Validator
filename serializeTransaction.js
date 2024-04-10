@@ -1,5 +1,3 @@
-import { serializeUInt32LE, serializeVarInt, serializeValue } from "./utils.js";
-
 export function serializeTransaction(tx) {
   function toLittleEndian(hex) {
     return Buffer.from(hex, "hex").reverse().toString("hex");

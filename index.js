@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-
 import { calculateTxId, serializeVarInt } from "./utils.js";
 import crypto from "crypto";
 import { createBlockHeader } from "./createBlockHeader.js";
@@ -17,58 +16,98 @@ fs.readdirSync(mempoolPath).forEach((filename) => {
     fs.readFileSync(path.join(mempoolPath, filename), "utf8")
   );
   // if (
-  //   transaction.vin.length === 1 &&
+  //   transaction.vin.length === 2 &&
   //   transaction.vin[0].witness !== undefined &&
-  //   transaction.vin[0].prevout.scriptpubkey_type === "v0_p2wpkh"
+  //   transaction.vin[0].prevout.scriptpubkey_type === "v0_p2wpkh" &&
+  //   transaction.vin[1].witness !== undefined &&
+  //   transaction.vin[1].prevout.scriptpubkey_type === "v0_p2wpkh"
   // ) {
-  // transactions.set(filename, transaction);
+  //   transactions.set(filename, transaction);
   // }
 });
 
 const transaction = {
+  txid: "fe8b0e123c747e5d5f3d98ccb41cb341f607980b0ff4520e00842fd1b5e18032",
   version: 2,
   locktime: 0,
   vin: [
     {
-      txid: "6d57c863b52f812a74a742ca185f3672d30fab0941989c7f3ecaa6b9c69ef65f",
-      vout: 1,
+      txid: "6bc35fe441051d210d9f0b8aa934f3bd96a394858926d2e502b659d3cd4033a5",
+      vout: 7,
       prevout: {
-        scriptpubkey: "a914d84e569b6e08184a576417226b27ab0b01c0303787",
+        scriptpubkey: "001481fd5116f533935b4125dc286042bffb2303524a",
         scriptpubkey_asm:
-          "OP_HASH160 OP_PUSHBYTES_20 d84e569b6e08184a576417226b27ab0b01c03037 OP_EQUAL",
-        scriptpubkey_type: "p2sh",
-        scriptpubkey_address: "3MQjj28SJ5n4h9XXTzudZS2Sxm97pAZkuV",
-        value: 3592047,
+          "OP_0 OP_PUSHBYTES_20 81fd5116f533935b4125dc286042bffb2303524a",
+        scriptpubkey_type: "v0_p2wpkh",
+        scriptpubkey_address: "bc1qs874z9h4xwf4ksf9ms5xqs4llv3sx5j2lav2eu",
+        value: 1066987,
       },
-      scriptsig: "160014835f3378e186cda9ef674042b2272f333e7a7f4b",
-      scriptsig_asm:
-        "OP_PUSHBYTES_22 0014835f3378e186cda9ef674042b2272f333e7a7f4b",
+      scriptsig: "",
+      scriptsig_asm: "",
       witness: [
-        "30440220207dab70062734c729b35024d5c61a1b90dd95aeb740172fe4350960a8ec48c202205002b6cc63afb8a05431994140592b675737db71c07e093f7b5ada6363679cb701",
-        "0394bd74ea55eb0c8acf11ea27da5a46fc6bc795e51e72f79c24e5ab9cf53ba88b",
+        "304402207a441be313cc0137653db942ccdc10e4ebb718acee6f6987cb2084fae232339702205f7ceb9dc1c5302883ae17499c929db128268c08ca8c13117734a5106427d41f01",
+        "028daec24d151ce9df0e106b37e341521fdb195f4dfc985044e20369b71302acc4",
       ],
       is_coinbase: false,
-      sequence: 4294967293,
-      inner_redeemscript_asm:
-        "OP_0 OP_PUSHBYTES_20 835f3378e186cda9ef674042b2272f333e7a7f4b",
+      sequence: 0,
+    },
+    {
+      txid: "d8385af736454ca96418751868677e50fcd581b56c6271c369093a802c698574",
+      vout: 5,
+      prevout: {
+        scriptpubkey: "001481fd5116f533935b4125dc286042bffb2303524a",
+        scriptpubkey_asm:
+          "OP_0 OP_PUSHBYTES_20 81fd5116f533935b4125dc286042bffb2303524a",
+        scriptpubkey_type: "v0_p2wpkh",
+        scriptpubkey_address: "bc1qs874z9h4xwf4ksf9ms5xqs4llv3sx5j2lav2eu",
+        value: 2326137,
+      },
+      scriptsig: "",
+      scriptsig_asm: "",
+      witness: [
+        "3044022068bb0b753b7ea24e800a780d835b92d2c3fd4c3b89c84c7a6230286401784d3d022026cc3f2ac04cf685d3c8f9fae0e14afe2ec8cba37aaed8b269fd9f3667916a4e01",
+        "028daec24d151ce9df0e106b37e341521fdb195f4dfc985044e20369b71302acc4",
+      ],
+      is_coinbase: false,
+      sequence: 0,
     },
   ],
   vout: [
     {
-      scriptpubkey: "0014db562202f7393129acba87250f17312ad39a52b6",
+      scriptpubkey: "a9149f9cac9e8126ca823f9abdc22cec2b7457a6a9c487",
       scriptpubkey_asm:
-        "OP_0 OP_PUSHBYTES_20 db562202f7393129acba87250f17312ad39a52b6",
+        "OP_HASH160 OP_PUSHBYTES_20 9f9cac9e8126ca823f9abdc22cec2b7457a6a9c4 OP_EQUAL",
+      scriptpubkey_type: "p2sh",
+      scriptpubkey_address: "3GEy3xxNRq8iK7tqy7mWXH2pACjHvG2bSN",
+      value: 2000000,
+    },
+    {
+      scriptpubkey: "00148b463132402255acaf252c06933d8caec67a9f18",
+      scriptpubkey_asm:
+        "OP_0 OP_PUSHBYTES_20 8b463132402255acaf252c06933d8caec67a9f18",
       scriptpubkey_type: "v0_p2wpkh",
-      scriptpubkey_address: "bc1qmdtzyqhh8ycjnt96sujs79e39tfe554k7rz7p2",
-      value: 3589558,
+      scriptpubkey_address: "bc1q3drrzvjqyf26ete99srfx0vv4mr848ccp85t6e",
+      value: 1389362,
     },
   ],
+  size: 371,
+  weight: 836,
+  fee: 3762,
+  status: {
+    confirmed: true,
+    block_height: 834638,
+    block_hash:
+      "000000000000000000025f742c626208ac87e0b7d15054abb4a19ca2d735a54e",
+    block_time: 1710405325,
+  },
+  hex: "02000000000102a53340cdd359b602e5d226898594a396bdf334a98a0b9f0d211d0541e45fc36b0700000000000000007485692c803a0969c371626cb581d5fc507e676818751864a94c4536f75a38d80500000000000000000280841e000000000017a9149f9cac9e8126ca823f9abdc22cec2b7457a6a9c48732331500000000001600148b463132402255acaf252c06933d8caec67a9f180247304402207a441be313cc0137653db942ccdc10e4ebb718acee6f6987cb2084fae232339702205f7ceb9dc1c5302883ae17499c929db128268c08ca8c13117734a5106427d41f0121028daec24d151ce9df0e106b37e341521fdb195f4dfc985044e20369b71302acc402473044022068bb0b753b7ea24e800a780d835b92d2c3fd4c3b89c84c7a6230286401784d3d022026cc3f2ac04cf685d3c8f9fae0e14afe2ec8cba37aaed8b269fd9f3667916a4e0121028daec24d151ce9df0e106b37e341521fdb195f4dfc985044e20369b71302acc400000000",
 };
 
 transactions.set(
-  "6d57c863b52f812a74a742ca185f3672d30fab0941989c7f3ecaa6b9c69ef65f.json",
+  "ff3cc5c137f8bc3aa4b58a00473b00e482a53e8e5aafbf596c053a75e6967124.json",
   transaction
 );
+
 let validTransactions = [];
 let fee = 0;
 transactions.forEach((transaction, fileName) => {
@@ -92,7 +131,7 @@ transactions.forEach((transaction, fileName) => {
   // Script and Signature Validation
   const result = executeScript(transaction);
   if (!result) {
-    console.log("Transaction is invalid");
+    console.log("Transaction is invalid in: ", transaction.vin[0].txid);
     return false;
   }
 
@@ -113,38 +152,38 @@ transactions.forEach((transaction, fileName) => {
 
   validTransactions.push(transaction);
 });
-// console.log(fee);
-const blockHeader = createBlockHeader(validTransactions);
-const transactionNumber = serializeVarInt(validTransactions.length);
-const coinbaseTx = createCoinbaseTransaction(fee);
-const serializedCoinbaseTx = serializeTransaction(coinbaseTx);
-const coinbaseTxId = calculateTxId(serializedCoinbaseTx);
-coinbaseTx.TxId = coinbaseTxId.toString("hex");
-validTransactions.unshift(coinbaseTx);
-const transactionsTxId = validTransactions.map((tx) => tx.TxId).join("\n");
+console.log(fee);
+// const blockHeader = createBlockHeader(validTransactions);
+// const transactionNumber = serializeVarInt(validTransactions.length);
+// const coinbaseTx = createCoinbaseTransaction(fee);
+// const serializedCoinbaseTx = serializeTransaction(coinbaseTx);
+// const coinbaseTxId = calculateTxId(serializedCoinbaseTx);
+// coinbaseTx.TxId = coinbaseTxId.toString("hex");
+// validTransactions.unshift(coinbaseTx);
+// const transactionsTxId = validTransactions.map((tx) => tx.TxId).join("\n");
 
-const data = `
-${blockHeader}
-${serializedCoinbaseTx}
-${transactionsTxId}
-`;
-class Block {
-  constructor(blockHeader, transactionNumber, coinbaseTx, transactionsTxId) {
-    this.blockHeader = blockHeader;
-    this.transactionNumber = transactionNumber.toString("hex");
-    this.coinbaseTx = coinbaseTx;
-    this.transactionsTxId = transactionsTxId;
-  }
-}
+// const data = `
+// ${blockHeader}
+// ${serializedCoinbaseTx}
+// ${transactionsTxId}
+// `;
+// class Block {
+//   constructor(blockHeader, transactionNumber, coinbaseTx, transactionsTxId) {
+//     this.blockHeader = blockHeader;
+//     this.transactionNumber = transactionNumber.toString("hex");
+//     this.coinbaseTx = coinbaseTx;
+//     this.transactionsTxId = transactionsTxId;
+//   }
+// }
 
-const block = new Block(
-  blockHeader,
-  transactionNumber,
-  coinbaseTx,
-  transactionsTxId
-);
+// const block = new Block(
+//   blockHeader,
+//   transactionNumber,
+//   coinbaseTx,
+//   transactionsTxId
+// );
 
-fs.writeFile("output.txt", data, (err) => {
-  if (err) throw err;
-  console.log("The file has been saved!");
-});
+// fs.writeFile("output.txt", data, (err) => {
+//   if (err) throw err;
+//   console.log("The file has been saved!");
+// });

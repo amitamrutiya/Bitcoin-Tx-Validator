@@ -1,7 +1,7 @@
 import { isValidSignature } from "./verifySignature.js";
-import { hash160 } from "./utils.js";
+import { hash160, sha256 } from "./utils.js";
 
-export function executeScript(transaction) {
+export function  executeScript(transaction) {
   for (let input of transaction.vin) {
     let stack = [];
     let script = "";
@@ -49,7 +49,22 @@ export function executeScript(transaction) {
         stack.push(input.witness[0]);
         stack.push(input.witness[1]);
       }
-      console.log(stack);
+    } else if (
+      input.prevout.scriptpubkey_type === "v0_p2wsh" &&
+      input.witness !== undefined &&
+      input.witness[0] === ""
+    ) {
+      const signatures = input.witness.slice(1, -1);
+      const scriptsig = input.witness[input.witness.length - 1];
+      stack.push(...signatures);
+      script =
+        input.inner_witnessscript_asm +
+        " " +
+        scriptsig +
+        " OP_SHA256 " +
+        input.prevout.scriptpubkey_asm +
+        " OP_EQUAL";
+      scriptTokens = script.split(" ");
     } else if (input.prevout.scriptpubkey_type === "v0_p2wpkh") {
       const pkh = input.prevout.scriptpubkey_asm.split(" ")[2];
       stack.push(input.witness[0]);
@@ -106,9 +121,6 @@ export function executeScript(transaction) {
           return false;
         }
         stack.push(bytes);
-      } else if (token === "OP_PUSHNUM_1") {
-        // Push number 1 onto the stack
-        stack.push(1);
       } else if (token === "OP_0") {
       } else if (token === "OP_CHECKMULTISIG") {
         const n = parseInt(stack.pop().substring("OP_PUSHNUM_".length));
@@ -116,8 +128,8 @@ export function executeScript(transaction) {
         for (let i = 0; i < n; i++) {
           publicKeys.push(stack.pop());
         }
-
         const m = parseInt(stack.pop().substring("OP_PUSHNUM_".length));
+
         const signatures = [];
         for (let i = 0; i < m; i++) {
           signatures.push(stack.pop());
@@ -126,12 +138,16 @@ export function executeScript(transaction) {
         // console.log("Signatures: ", signatures);
         const isValid = isValidSignature(transaction, signatures, publicKeys);
         stack.push(isValid);
+      } else if (token === "OP_SHA256") {
+        const data = stack.pop();
+        const hashedData = sha256(data);
+        stack.push(hashedData);
       } else {
         // Other script tokens (e.g., signatures, public keys)
         stack.push(token);
       }
       // Log the state of the stack
-      // console.log(`After executing ${token}, stack is: `, stack);
+      console.log(`After executing ${token}, stack is: `, stack);
     }
 
     // Check if the stack is empty and contains only true values
@@ -140,6 +156,7 @@ export function executeScript(transaction) {
         return false;
       }
     }
-    return true;
+    if (stack.length) return true;
+    return false;
   }
 }
