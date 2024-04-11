@@ -26,11 +26,11 @@ export function serializeVarInt(value) {
   if (value < 0xfd) {
     return serializeUInt8LE(value);
   } else if (value <= 0xffff) {
-    return "fd" + serializeUInt16LE(value);
+    return "fd" + serializeUInt16LE(value).toString("hex");
   } else if (value <= 0xffffffff) {
-    return "fe" + serializeUInt32LE(value);
+    return "fe" + serializeUInt32LE(value).toString("hex");
   } else {
-    return "ff" + serializeUInt64LE(value);
+    return "ff" + serializeUInt64LE(value).toString("hex");
   }
 }
 
@@ -67,6 +67,7 @@ export function verifySignature(
     }
     return true;
   } catch (error) {
+    console.log("Error in verifySignature ", signatureHex, publicKeyHex);
     console.log(error);
     return false;
   }
@@ -165,4 +166,3 @@ export function parseDer(signature) {
 
   return { r, s };
 }
-

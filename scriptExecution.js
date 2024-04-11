@@ -1,8 +1,10 @@
 import { isValidSignature } from "./verifySignature.js";
 import { hash160, sha256 } from "./utils.js";
 
-export function  executeScript(transaction) {
+export function executeScript(transaction) {
+  let allValid = true;
   for (let input of transaction.vin) {
+    // console.log("Input: ", input)
     let stack = [];
     let script = "";
     let scriptTokens = [];
@@ -12,15 +14,13 @@ export function  executeScript(transaction) {
       scriptTokens = script.split(" ");
     } else if (
       input.prevout.scriptpubkey_type === "p2sh" &&
-      input.witness === undefined
+      input.witness === undefined &&
+      !input.inner_redeemscript_asm.split(" ").includes("OP_CSV")
     ) {
+      const scriptsig_asm = input.scriptsig_asm.split(" ");
       const inner_redeemscript = [
-        input.scriptsig_asm.split(" ")[
-          input.scriptsig_asm.split(" ").length - 2
-        ],
-        input.scriptsig_asm.split(" ")[
-          input.scriptsig_asm.split(" ").length - 1
-        ],
+        scriptsig_asm[scriptsig_asm.length - 2],
+        scriptsig_asm[scriptsig_asm.length - 1],
       ];
       const scriptSig = input.scriptsig_asm.split(" ");
       scriptSig.splice(-2, 2);
@@ -50,6 +50,24 @@ export function  executeScript(transaction) {
         stack.push(input.witness[1]);
       }
     } else if (
+      input.prevout.scriptpubkey_type === "p2sh" &&
+      input.witness !== undefined &&
+      input.witness.length > 2 &&
+      !input.inner_witnessscript_asm.split(" ").includes("OP_CSV") &&
+      !input.inner_witnessscript_asm.split(" ").includes("OP_DROP")
+    ) {
+      const signatures = input.witness.slice(1, -1);
+      const scriptsig = input.scriptsig_asm.split(" ")[1];
+      stack.push(...signatures);
+      script =
+        input.inner_witnessscript_asm +
+        " " +
+        scriptsig +
+        " " +
+        input.prevout.scriptpubkey_asm;
+      // console.log(script);
+      scriptTokens = script.split(" ");
+    } else if (
       input.prevout.scriptpubkey_type === "v0_p2wsh" &&
       input.witness !== undefined &&
       input.witness[0] === ""
@@ -73,6 +91,11 @@ export function  executeScript(transaction) {
       script = "OP_DUP OP_HASH160 " + pkh + " OP_EQUALVERIFY OP_CHECKSIG";
 
       scriptTokens = script.split(" ");
+    } else if (input.prevout.scriptpubkey_type === "v1_p2tr") {
+      return true;
+    } else {
+      console.log("Unsupported script type in " + input.txid);
+      return false;
     }
     while (scriptTokens.length > 0) {
       const token = scriptTokens.shift();
@@ -80,14 +103,19 @@ export function  executeScript(transaction) {
         // Check signature
         const publicKey = stack.pop();
         const signature = stack.pop();
-        const isValid = isValidSignature(transaction, [signature], [publicKey]);
+        const isValid = isValidSignature(
+          transaction,
+          input,
+          [signature],
+          [publicKey]
+        );
         stack.push(isValid);
       } else if (token === "OP_EQUALVERIFY") {
         // Check equality and verify
         const value1 = stack.pop();
         const value2 = stack.pop();
         if (value1 !== value2) {
-          console.log("Values not equal");
+          console.log("Values not equal in" + input.txid);
           return false; // Values not equal
         }
       } else if (token === "OP_EQUAL") {
@@ -136,27 +164,31 @@ export function  executeScript(transaction) {
         }
         // console.log("Public keys: ", publicKeys);
         // console.log("Signatures: ", signatures);
-        const isValid = isValidSignature(transaction, signatures, publicKeys);
+        const isValid = isValidSignature(
+          transaction,
+          input,
+          signatures,
+          publicKeys
+        );
         stack.push(isValid);
       } else if (token === "OP_SHA256") {
         const data = stack.pop();
         const hashedData = sha256(data);
         stack.push(hashedData);
       } else {
-        // Other script tokens (e.g., signatures, public keys)
         stack.push(token);
       }
       // Log the state of the stack
-      console.log(`After executing ${token}, stack is: `, stack);
+      // console.log(`After executing ${token}, stack is: `, stack);
     }
 
     // Check if the stack is empty and contains only true values
     for (let i = 0; i < stack.length; i++) {
       if (stack[i] !== true) {
-        return false;
+        allValid = false;
       }
     }
-    if (stack.length) return true;
-    return false;
+    if (stack.length === 0) allValid = false;
   }
+  return allValid;
 }

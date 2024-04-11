@@ -6,36 +6,22 @@ import {
   verifySignature,
 } from "./utils.js";
 
-const SIGHASH_ALL = "01000000";
-
 export default function verifyLegacyTransaction(
   transaction,
   input,
   signatures,
   publicKeys
 ) {
-  const serialized = serializeLegacyTransaction(transaction);
-  const hashResult = sha256Double(serialized);
-  const scriptsig_asm = input.scriptsig_asm.split(" ");
-  if (input.prevout.scriptpubkey_type === "p2sh") {
-    for (let i = 0; i < scriptsig_asm.length; i++) {
-      if (scriptsig_asm[i] === "OP_PUSHBYTES_71") {
-        signatures.push(scriptsig_asm[i + 1]);
-      }
-    }
-    const inner_redeemscript_asm = input.inner_redeemscript_asm.split(" ");
-    for (let i = 0; i < inner_redeemscript_asm.length; i++) {
-      if (
-        inner_redeemscript_asm[i] === "OP_PUSHBYTES_33" ||
-        inner_redeemscript_asm[i] === "OP_PUSHBYTES_65"
-      ) {
-        publicKeys.push(inner_redeemscript_asm[i + 1]);
-      }
-    }
-  }
+  const serialized = serializeLegacyTransaction(transaction, input, signatures);
+  // console.log(serialized.toString("hex"));
   let validCount = 0;
   for (let signature of signatures) {
     for (let publicKey of publicKeys) {
+      const sighashType = Buffer.alloc(4);
+      sighashType.writeUInt32LE(parseInt(signature.slice(-2), 16), 0);
+      const serializedWithSighash = Buffer.concat([serialized, sighashType]);
+      // console.log(serializedWithSighash.toString("hex"));
+      const hashResult = sha256Double(serializedWithSighash);
       const result = verifySignature(
         hashResult.toString("hex"),
         signature,
@@ -51,25 +37,46 @@ export default function verifyLegacyTransaction(
   return isValid;
 }
 
-function serializeLegacyTransaction(transaction) {
+function serializeLegacyTransaction(transaction, input, signatures) {
+  const signatureType = signatures[0].slice(-2);
+  let sighashType;
+  let anyOneCanPayFlag = false;
+  if (signatureType === "01") {
+    sighashType = "ALL";
+  } else if (signatureType === "02") {
+    sighashType = "NONE";
+  } else if (signatureType === "03") {
+    sighashType = "SINGLE";
+  } else if (signatureType === "81") {
+    sighashType = "ALL";
+    anyOneCanPayFlag = true;
+  } else if (signatureType === "82") {
+    sighashType = "NONE";
+    anyOneCanPayFlag = true;
+  } else if (signatureType === "83") {
+    sighashType = "SINGLE";
+    anyOneCanPayFlag = true;
+  }
   const version = serializeUInt32LE(transaction.version);
-  const vinLength = serializeVarInt(transaction.vin.length);
-  const inputs = Buffer.from(serializeInputs(transaction.vin), "hex");
+  let vinLength;
+  if (anyOneCanPayFlag) {
+    vinLength = Buffer.from(serializeVarInt(1), "hex");
+  } else {
+    vinLength = Buffer.from(serializeVarInt(transaction.vin.length), "hex");
+  }
+  const inputs = Buffer.from(
+    serializeInputs(transaction.vin, input, anyOneCanPayFlag),
+    "hex"
+  );
   const outputs = Buffer.from(serializeOutputs(transaction.vout), "hex");
   const locktime = serializeUInt32LE(transaction.locktime);
-  const sighashType = Buffer.alloc(4);
-  sighashType.writeUInt32LE(1, 0);
-  return Buffer.concat([
-    version,
-    vinLength,
-    inputs,
-    outputs,
-    locktime,
-    sighashType,
-  ]);
+  return Buffer.concat([version, vinLength, inputs, outputs, locktime]);
 }
 
-function serializeInputs(inputs) {
+function serializeInputs(inputs, input, anyOneCanPayFlag) {
+  if (anyOneCanPayFlag) {
+    inputs = [input];
+  }
   let serialized = "";
   for (let input of inputs) {
     serialized += Buffer.from(input.txid, "hex").reverse().toString("hex");
