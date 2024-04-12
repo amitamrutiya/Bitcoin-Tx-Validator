@@ -7,6 +7,7 @@ import { createCoinbaseTransaction } from "./createCoinbaseTransaction.js";
 import { isValidAddresses } from "./verifyAddress.js";
 import { serializeTransaction } from "./serializeTransaction.js";
 import { executeScript } from "./scriptExecution.js";
+import { serializeWitnessTransaction } from "./serializeWitnessTransaction.js";
 
 const mempoolPath = "./mempool";
 
@@ -27,8 +28,8 @@ fs.readdirSync(mempoolPath).forEach((filename) => {
 });
 
 // transactions.set(
-//   "ff3cc5c137f8bc3aa4b58a00473b00e482a53e8e5aafbf596c053a75e6967124.json",
-//   transaction
+// "ff3cc5c137f8bc3aa4b58a00473b00e482a53e8e5aafbf596c053a75e6967124.json"
+// transaction
 // );
 
 let validTransactions = [];
@@ -46,12 +47,15 @@ transactions.forEach((transaction, fileName) => {
   // Transaction ID Validation
   const serializedTransaction = serializeTransaction(transaction);
   const TxId = calculateTxId(serializedTransaction);
+  const serializedWitnessTransaction = serializeWitnessTransaction(transaction);
+  const wTxId = calculateTxId(serializedWitnessTransaction);
   const getFileName = crypto.createHash("sha256").update(TxId).digest("hex");
   if (fileName !== getFileName + ".json") {
     console.log("File name does not match" + fileName);
     // return;
   }
   transaction["TxId"] = TxId.toString("hex");
+  transaction["wTxId"] = wTxId.toString("hex");
 
   // Script and Signature Validation
   const result = executeScript(transaction, p2trUnspendable);
@@ -82,16 +86,19 @@ transactions.forEach((transaction, fileName) => {
 console.log(fee);
 const blockHeader = createBlockHeader(validTransactions);
 const transactionNumber = serializeVarInt(validTransactions.length);
-const coinbaseTx = createCoinbaseTransaction(fee);
+const coinbaseTx = createCoinbaseTransaction(fee, validTransactions);
 const serializedCoinbaseTx = serializeTransaction(coinbaseTx);
+const serializedWitnessCoinbaseTx = serializeWitnessTransaction(coinbaseTx);
 const coinbaseTxId = calculateTxId(serializedCoinbaseTx);
+const coinbaseWTxId = calculateTxId(serializedWitnessCoinbaseTx);
 coinbaseTx.TxId = coinbaseTxId.toString("hex");
+coinbaseTx.wTxId = coinbaseWTxId.toString("hex");
 validTransactions.unshift(coinbaseTx);
 const transactionsTxId = validTransactions.map((tx) => tx.TxId).join("\n");
 
 const data = `
 ${blockHeader}
-${serializedCoinbaseTx}
+${serializedWitnessCoinbaseTx}
 ${transactionsTxId}
 `;
 class Block {

@@ -44,7 +44,7 @@ function reversebytes(data) {
 }
 
 // Create merkle root
-function createMerkleRoot(transactions) {
+function createMerkleRootofTxid(transactions) {
   let merkleTree = [];
   for (const tx of transactions) {
     merkleTree.push(Buffer.from(tx.TxId, "hex").reverse());
@@ -76,7 +76,7 @@ export function createBlockHeader(transactions) {
   const time = dateStringToUnixTime();
   const bits = targetToBits(target);
   let nonce = 0;
-  const merkleroot = createMerkleRoot(transactions);
+  const merkleroot = createMerkleRootofTxid(transactions);
 
   // Block Header (Serialized)
   let header =
