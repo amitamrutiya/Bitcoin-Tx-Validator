@@ -70,12 +70,12 @@ function createMerkleRoot(transactions) {
 export function createBlockHeader(transactions) {
   const target =
     "0000ffff00000000000000000000000000000000000000000000000000000000";
-  const version = "2";
+  const version = "4";
   const prevblock =
-    "0000000000000000023bb908db2343552c05357419a8a9de19c8184fb8a3fcf9";
+    "0000000000000000000000000000000000000000000000000000000000000000";
   const time = dateStringToUnixTime();
   const bits = targetToBits(target);
-  let nonce = 35710;
+  let nonce = 0;
   const merkleroot = createMerkleRoot(transactions);
 
   // Block Header (Serialized)
@@ -92,7 +92,7 @@ export function createBlockHeader(transactions) {
     const result = reversebytes(hash256(attempt));
 
     // show result
-    console.log(`${nonce}: Block Hash : ${result}`);
+    // console.log(`${nonce}: Block Hash : ${result}`);
 
     // end if we get a block hash below the target
     if (BigInt("0x" + result) < BigInt("0x" + target)) {

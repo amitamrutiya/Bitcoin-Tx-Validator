@@ -8,7 +8,7 @@ import { isValidAddresses } from "./verifyAddress.js";
 import { serializeTransaction } from "./serializeTransaction.js";
 import { executeScript } from "./scriptExecution.js";
 
-const mempoolPath = "./valid-mempool";
+const mempoolPath = "./mempool";
 
 const transactions = new Map();
 fs.readdirSync(mempoolPath).forEach((filename) => {
@@ -33,6 +33,8 @@ fs.readdirSync(mempoolPath).forEach((filename) => {
 
 let validTransactions = [];
 let fee = 0;
+let p2trUnspendable = { value: 0 };
+
 transactions.forEach((transaction, fileName) => {
   // Address Validation
   const isValidAddress = isValidAddresses(transaction);
@@ -46,15 +48,15 @@ transactions.forEach((transaction, fileName) => {
   const TxId = calculateTxId(serializedTransaction);
   const getFileName = crypto.createHash("sha256").update(TxId).digest("hex");
   if (fileName !== getFileName + ".json") {
-    // console.log("File name does not match" + fileName);
+    console.log("File name does not match" + fileName);
     // return;
   }
   transaction["TxId"] = TxId.toString("hex");
 
   // Script and Signature Validation
-  const result = executeScript(transaction);
+  const result = executeScript(transaction, p2trUnspendable);
   if (!result) {
-    console.log("Transaction is invalid in: ", transaction.vin[0].txid);
+    // console.log("Transaction is invalid in: ", transaction.vin[0].txid);
     return false;
   } else {
     // console.log("Transaction is valid in: ", transaction.vin[0].txid);
@@ -75,40 +77,40 @@ transactions.forEach((transaction, fileName) => {
   }
   fee += inputTotal - outputTotal;
 
-  validTransactions.push(transaction);
+  if (result) validTransactions.push(transaction);
 });
 console.log(fee);
-// const blockHeader = createBlockHeader(validTransactions);
-// const transactionNumber = serializeVarInt(validTransactions.length);
-// const coinbaseTx = createCoinbaseTransaction(fee);
-// const serializedCoinbaseTx = serializeTransaction(coinbaseTx);
-// const coinbaseTxId = calculateTxId(serializedCoinbaseTx);
-// coinbaseTx.TxId = coinbaseTxId.toString("hex");
-// validTransactions.unshift(coinbaseTx);
-// const transactionsTxId = validTransactions.map((tx) => tx.TxId).join("\n");
+const blockHeader = createBlockHeader(validTransactions);
+const transactionNumber = serializeVarInt(validTransactions.length);
+const coinbaseTx = createCoinbaseTransaction(fee);
+const serializedCoinbaseTx = serializeTransaction(coinbaseTx);
+const coinbaseTxId = calculateTxId(serializedCoinbaseTx);
+coinbaseTx.TxId = coinbaseTxId.toString("hex");
+validTransactions.unshift(coinbaseTx);
+const transactionsTxId = validTransactions.map((tx) => tx.TxId).join("\n");
 
-// const data = `
-// ${blockHeader}
-// ${serializedCoinbaseTx}
-// ${transactionsTxId}
-// `;
-// class Block {
-//   constructor(blockHeader, transactionNumber, coinbaseTx, transactionsTxId) {
-//     this.blockHeader = blockHeader;
-//     this.transactionNumber = transactionNumber.toString("hex");
-//     this.coinbaseTx = coinbaseTx;
-//     this.transactionsTxId = transactionsTxId;
-//   }
-// }
+const data = `
+${blockHeader}
+${serializedCoinbaseTx}
+${transactionsTxId}
+`;
+class Block {
+  constructor(blockHeader, transactionNumber, coinbaseTx, transactionsTxId) {
+    this.blockHeader = blockHeader;
+    this.transactionNumber = transactionNumber.toString("hex");
+    this.coinbaseTx = coinbaseTx;
+    this.transactionsTxId = transactionsTxId;
+  }
+}
 
-// const block = new Block(
-//   blockHeader,
-//   transactionNumber,
-//   coinbaseTx,
-//   transactionsTxId
-// );
+const block = new Block(
+  blockHeader,
+  transactionNumber,
+  coinbaseTx,
+  transactionsTxId
+);
 
-// fs.writeFile("output.txt", data, (err) => {
-//   if (err) throw err;
-//   console.log("The file has been saved!");
-// });
+fs.writeFile("output.txt", data, (err) => {
+  if (err) throw err;
+  console.log("The file has been saved!");
+});

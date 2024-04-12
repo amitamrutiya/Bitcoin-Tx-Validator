@@ -18,7 +18,7 @@ export function isValidSignature(
     } else if (outerInput.prevout.scriptpubkey_type === "v0_p2wpkh") {
       outerInput.scriptsig = outerInput.prevout.scriptpubkey;
     } else {
-      return true;
+      return false;
     }
     const isValid = verifySegwitTransaction(
       transaction,
@@ -41,6 +41,8 @@ export function isValidSignature(
       outerInput.scriptsig = scriptsig_asm[scriptsig_asm.length - 1];
     } else if (outerInput.prevout.scriptpubkey_type === "p2pkh") {
       outerInput.scriptsig = outerInput.prevout.scriptpubkey;
+    } else {
+      return false;
     }
     // console.log(transaction);
     const isValid = verifyLegacyTransaction(

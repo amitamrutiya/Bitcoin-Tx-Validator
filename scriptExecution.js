@@ -1,10 +1,9 @@
 import { isValidSignature } from "./verifySignature.js";
 import { hash160, sha256 } from "./utils.js";
 
-export function executeScript(transaction) {
+export function executeScript(transaction, p2trUnspendable) {
   let allValid = true;
   for (let input of transaction.vin) {
-    // console.log("Input: ", input)
     let stack = [];
     let script = "";
     let scriptTokens = [];
@@ -92,9 +91,9 @@ export function executeScript(transaction) {
 
       scriptTokens = script.split(" ");
     } else if (input.prevout.scriptpubkey_type === "v1_p2tr") {
-      return true;
+      return false;
     } else {
-      console.log("Unsupported script type in " + input.txid);
+      // console.log("Unsupported script type in " + input.txid);
       return false;
     }
     while (scriptTokens.length > 0) {
@@ -175,6 +174,25 @@ export function executeScript(transaction) {
         const data = stack.pop();
         const hashedData = sha256(data);
         stack.push(hashedData);
+      } else if (token === "OP_DROP") {
+        stack.pop();
+      } else if (token === "OP_CSV") {
+        const n = parseInt(stack.pop().substring("OP_PUSHNUM_".length));
+        if (n < 0) {
+          return false;
+        }
+      } else if (token === "OP_SWAP") {
+        const top = stack.pop();
+        const second = stack.pop();
+        stack.push(top);
+        stack.push(second);
+      } else if (token === "OP_IF") {
+        const condition = stack.pop();
+        if (condition !== false) {
+          stack.push(true);
+        }
+      } else if (token === "OP_ELSE") {
+      } else if (token === "OP_ENDIF") {
       } else {
         stack.push(token);
       }
