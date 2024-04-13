@@ -95,10 +95,12 @@ const coinbaseWTxId = calculateTxId(serializedWitnessCoinbaseTx);
 coinbaseTx.TxId = coinbaseTxId.toString("hex");
 coinbaseTx.wTxId = coinbaseWTxId.toString("hex");
 validTransactions.unshift(coinbaseTx);
-const transactionsTxId = validTransactions.map((tx) => tx.TxId).join("\n");
+const transactionsTxId = validTransactions
+  .map((tx) => tx.TxId)
+  .filter(Boolean)
+  .join("\n");
 
-const data = `
-${blockHeader}
+const data = `${blockHeader}
 ${serializedWitnessCoinbaseTx}
 ${transactionsTxId}
 `;
