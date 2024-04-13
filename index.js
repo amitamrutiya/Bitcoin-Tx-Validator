@@ -79,11 +79,12 @@ transactions.forEach((transaction, fileName) => {
     console.log("Output total exceeds input total");
     return false; // Output total exceeds input total
   }
-  fee += inputTotal - outputTotal;
-
-  if (result) validTransactions.push(transaction);
+  if (result) {
+    fee += inputTotal - outputTotal;
+    validTransactions.push(transaction);
+  }
 });
-console.log(fee);
+// console.log(fee);
 const blockHeader = createBlockHeader(validTransactions);
 const transactionNumber = serializeVarInt(validTransactions.length);
 const coinbaseTx = createCoinbaseTransaction(fee, validTransactions);
@@ -119,5 +120,5 @@ const block = new Block(
 
 fs.writeFile("output.txt", data, (err) => {
   if (err) throw err;
-  console.log("The file has been saved!");
+  // console.log("The file has been saved!");
 });
