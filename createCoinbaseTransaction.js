@@ -58,5 +58,5 @@ function createMerkleRootofwTxid(transactions) {
 
     merkleTree = nextTree;
   }
-  return merkleTree[0].reverse().toString("hex");
+  return merkleTree[0].toString("hex");
 }
