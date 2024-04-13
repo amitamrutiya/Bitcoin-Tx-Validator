@@ -1,14 +1,14 @@
+import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-import { calculateTxId, serializeVarInt } from "./utils.js";
-import crypto from "crypto";
 import { createBlockHeader } from "./createBlockHeader.js";
 import { createCoinbaseTransaction } from "./createCoinbaseTransaction.js";
-import { isValidAddresses } from "./verifyAddress.js";
-import { serializeTransaction } from "./serializeTransaction.js";
 import { executeScript } from "./scriptExecution.js";
-import { serializeWitnessTransaction } from "./serializeWitnessTransaction.js";
 import { selectTransaction } from "./selectTransaction.js";
+import { serializeTransaction } from "./serializeTransaction.js";
+import { serializeWitnessTransaction } from "./serializeWitnessTransaction.js";
+import { calculateTxId, serializeVarInt } from "./utils.js";
+import { isValidAddresses } from "./verifyAddress.js";
 
 const mempoolPath = "./mempool";
 
@@ -20,200 +20,70 @@ fs.readdirSync(mempoolPath).forEach((filename) => {
   transactions.set(filename, transaction);
 });
 
-// const transaction1 = {
-//   txid: "0c43c7f0c6ba6a59de1a66b7932b56c2737ca0efb26bb6d3d5011ec57d50cc00",
-//   version: 2,
+// const transaction = {
+//   txid: "ffd77a505db6e6ebdccda183dd8590d5ae8bad19445c5377d2b3765a518938de",
+//   version: 1,
 //   locktime: 0,
 //   vin: [
 //     {
-//       txid: "5525faff4e6da81939ad70703cbf5a2129d34dcff217cb869745f6da0c658e0d",
-//       vout: 2,
+//       txid: "46b3b07ca9d4fd64b8f776507178d1514433d46dd5117b3289815d33c2993fb6",
+//       vout: 1,
 //       prevout: {
-//         scriptpubkey: "a91422baf11c8ab5c935dd0c74d9e898a70d8f20693887",
+//         scriptpubkey: "0014dd95cc4ae6a28843e191640f524561c2590a5e5e",
 //         scriptpubkey_asm:
-//           "OP_HASH160 OP_PUSHBYTES_20 22baf11c8ab5c935dd0c74d9e898a70d8f206938 OP_EQUAL",
-//         scriptpubkey_type: "p2sh",
-//         scriptpubkey_address: "34rer1hXqwoXkdkJC9ny6JzHnLSKm6ffQF",
-//         value: 917071,
+//           "OP_0 OP_PUSHBYTES_20 dd95cc4ae6a28843e191640f524561c2590a5e5e",
+//         scriptpubkey_type: "v0_p2wpkh",
+//         scriptpubkey_address: "bc1qmk2ucjhx52yy8cv3vs84y3tpcfvs5hj7hk786n",
+//         value: 487531,
 //       },
-//       scriptsig: "16001498d452471b13eee620e8d99770761731d1ffb89c",
-//       scriptsig_asm:
-//         "OP_PUSHBYTES_22 001498d452471b13eee620e8d99770761731d1ffb89c",
+//       scriptsig: "",
+//       scriptsig_asm: "",
 //       witness: [
-//         "304402201c1a2e2fea485b9678554c0f698701510604e6c84302a8a84656a9e767570277022070de0e63cd5430a5b9e622f6da033ab13c53d568abd89e3c4099df3c452096be01",
-//         "02742674c19ed520ff01a18d12c624ceb650b75d202b4472e44fd68c642593b061",
+//         "304402207272dd9e06bee9353d9c9cd2286228b92138acf8bc915f166d89f86f799c28f2022074364651821b78c8843ec96daa3dbc30177117e171a56bcbd2415b40c8eae48e01",
+//         "027e6eaec3e8c3d82ed82c3bdf95047c7ea98e83b17a0f770bc570a3a74da7b02d",
 //       ],
-//       is_coinbase: false,
-//       sequence: 4294967293,
-//       inner_redeemscript_asm:
-//         "OP_0 OP_PUSHBYTES_20 98d452471b13eee620e8d99770761731d1ffb89c",
-//     },
-//   ],
-//   vout: [
-//     {
-//       scriptpubkey: "001421c330dfb348135950a3d58f540e4e484951a4fe",
-//       scriptpubkey_asm:
-//         "OP_0 OP_PUSHBYTES_20 21c330dfb348135950a3d58f540e4e484951a4fe",
-//       scriptpubkey_type: "v0_p2wpkh",
-//       scriptpubkey_address: "bc1qy8pnphanfqf4j59r6k84grjwfpy4rf870hfggh",
-//       value: 277000,
-//     },
-//     {
-//       scriptpubkey: "a91422baf11c8ab5c935dd0c74d9e898a70d8f20693887",
-//       scriptpubkey_asm:
-//         "OP_HASH160 OP_PUSHBYTES_20 22baf11c8ab5c935dd0c74d9e898a70d8f206938 OP_EQUAL",
-//       scriptpubkey_type: "p2sh",
-//       scriptpubkey_address: "34rer1hXqwoXkdkJC9ny6JzHnLSKm6ffQF",
-//       value: 635761,
-//     },
-//   ],
-// };
-// const transaction2 = {
-//   txid: "ffd919f6375d14bc6cc07af141dc2ca2f4d75a421146c2a3c7746a831efdf1ea",
-//   version: 2,
-//   locktime: 0,
-//   vin: [
-//     {
-//       txid: "ece731f93b136697eb0369606ac2a7969b3d77691a082ffb3cb19d469b7d466a",
-//       vout: 3,
-//       prevout: {
-//         scriptpubkey: "76a91475d616cf3f45edb8640770bc718bee468db9139788ac",
-//         scriptpubkey_asm:
-//           "OP_DUP OP_HASH160 OP_PUSHBYTES_20 75d616cf3f45edb8640770bc718bee468db91397 OP_EQUALVERIFY OP_CHECKSIG",
-//         scriptpubkey_type: "p2pkh",
-//         scriptpubkey_address: "1Bk4Xchs2nJVcz9PavUyozprDXs24uLz4A",
-//         value: 990000,
-//       },
-//       scriptsig:
-//         "4830450221008b776cb507dcdb1ad15bf5c0555add8e8c839ff146e73122c328105c4594a279022000923813f4487b624d1bf98e49ab9da9f2b3dc081e3c11fbf7070439787c2aaa012103bea5d859ec5d95c449c736a0f19a5e52fdacf8b6b96afeaa415cd49f11e6a07c",
-//       scriptsig_asm:
-//         "OP_PUSHBYTES_72 30450221008b776cb507dcdb1ad15bf5c0555add8e8c839ff146e73122c328105c4594a279022000923813f4487b624d1bf98e49ab9da9f2b3dc081e3c11fbf7070439787c2aaa01 OP_PUSHBYTES_33 03bea5d859ec5d95c449c736a0f19a5e52fdacf8b6b96afeaa415cd49f11e6a07c",
 //       is_coinbase: false,
 //       sequence: 4294967295,
 //     },
 //   ],
 //   vout: [
 //     {
-//       scriptpubkey: "0014a159b3ac03bb4222bbd087e917fca699ca9d3f68",
+//       scriptpubkey: "0014870753ec6eb9608a824843749cbb2ec8d7278d08",
 //       scriptpubkey_asm:
-//         "OP_0 OP_PUSHBYTES_20 a159b3ac03bb4222bbd087e917fca699ca9d3f68",
+//         "OP_0 OP_PUSHBYTES_20 870753ec6eb9608a824843749cbb2ec8d7278d08",
 //       scriptpubkey_type: "v0_p2wpkh",
-//       scriptpubkey_address: "bc1q59vm8tqrhdpz9w7ssl530l9xn89f60mgntzutg",
-//       value: 987256,
+//       scriptpubkey_address: "bc1qsur48mrwh9sg4qjggd6fewewertj0rggz8k5jx",
+//       value: 441895,
+//     },
+//     {
+//       scriptpubkey: "0014ca1e903254ad2daa0f793b3b9d6550d83c2bb227",
+//       scriptpubkey_asm:
+//         "OP_0 OP_PUSHBYTES_20 ca1e903254ad2daa0f793b3b9d6550d83c2bb227",
+//       scriptpubkey_type: "v0_p2wpkh",
+//       scriptpubkey_address: "bc1qeg0fqvj545k65rme8vae6e2smq7zhv38ekf358",
+//       value: 41829,
 //     },
 //   ],
-//   size: 189,
-//   weight: 756,
-//   fee: 2744,
+//   size: 222,
+//   weight: 561,
+//   fee: 3807,
 //   status: {
 //     confirmed: true,
-//     block_height: 834638,
+//     block_height: 834464,
 //     block_hash:
-//       "000000000000000000025f742c626208ac87e0b7d15054abb4a19ca2d735a54e",
-//     block_time: 1710405325,
+//       "0000000000000000000177a0869a911a2b65c9bdcd5a8bcb02b68f305bee848e",
+//     block_time: 1710308296,
 //   },
-//   hex: "02000000016a467d9b469db13cfb2f081a69773d9b96a7c26a606903eb9766133bf931e7ec030000006b4830450221008b776cb507dcdb1ad15bf5c0555add8e8c839ff146e73122c328105c4594a279022000923813f4487b624d1bf98e49ab9da9f2b3dc081e3c11fbf7070439787c2aaa012103bea5d859ec5d95c449c736a0f19a5e52fdacf8b6b96afeaa415cd49f11e6a07cffffffff0178100f0000000000160014a159b3ac03bb4222bbd087e917fca699ca9d3f6800000000",
+//   hex: "01000000000101b63f99c2335d8189327b11d56dd4334451d178715076f7b864fdd4a97cb0b3460100000000ffffffff0227be060000000000160014870753ec6eb9608a824843749cbb2ec8d7278d0865a3000000000000160014ca1e903254ad2daa0f793b3b9d6550d83c2bb2270247304402207272dd9e06bee9353d9c9cd2286228b92138acf8bc915f166d89f86f799c28f2022074364651821b78c8843ec96daa3dbc30177117e171a56bcbd2415b40c8eae48e0121027e6eaec3e8c3d82ed82c3bdf95047c7ea98e83b17a0f770bc570a3a74da7b02d00000000",
 // };
-// const transactions = [
-//   {
-//     txid: "ffd919f6375d14bc6cc07af141dc2ca2f4d75a421146c2a3c7746a831efdf1ea",
-//     version: 2,
-//     locktime: 0,
-//     vin: [
-//       {
-//         txid: "ece731f93b136697eb0369606ac2a7969b3d77691a082ffb3cb19d469b7d466a",
-//         vout: 3,
-//         prevout: {
-//           scriptpubkey: "76a91475d616cf3f45edb8640770bc718bee468db9139788ac",
-//           scriptpubkey_asm:
-//             "OP_DUP OP_HASH160 OP_PUSHBYTES_20 75d616cf3f45edb8640770bc718bee468db91397 OP_EQUALVERIFY OP_CHECKSIG",
-//           scriptpubkey_type: "p2pkh",
-//           scriptpubkey_address: "1Bk4Xchs2nJVcz9PavUyozprDXs24uLz4A",
-//           value: 990000,
-//         },
-//         scriptsig:
-//           "4830450221008b776cb507dcdb1ad15bf5c0555add8e8c839ff146e73122c328105c4594a279022000923813f4487b624d1bf98e49ab9da9f2b3dc081e3c11fbf7070439787c2aaa012103bea5d859ec5d95c449c736a0f19a5e52fdacf8b6b96afeaa415cd49f11e6a07c",
-//         scriptsig_asm:
-//           "OP_PUSHBYTES_72 30450221008b776cb507dcdb1ad15bf5c0555add8e8c839ff146e73122c328105c4594a279022000923813f4487b624d1bf98e49ab9da9f2b3dc081e3c11fbf7070439787c2aaa01 OP_PUSHBYTES_33 03bea5d859ec5d95c449c736a0f19a5e52fdacf8b6b96afeaa415cd49f11e6a07c",
-//         is_coinbase: false,
-//         sequence: 4294967295,
-//       },
-//     ],
-//     vout: [
-//       {
-//         scriptpubkey: "0014a159b3ac03bb4222bbd087e917fca699ca9d3f68",
-//         scriptpubkey_asm:
-//           "OP_0 OP_PUSHBYTES_20 a159b3ac03bb4222bbd087e917fca699ca9d3f68",
-//         scriptpubkey_type: "v0_p2wpkh",
-//         scriptpubkey_address: "bc1q59vm8tqrhdpz9w7ssl530l9xn89f60mgntzutg",
-//         value: 987256,
-//       },
-//     ],
-//     size: 189,
-//     weight: 756,
-//     fee: 2744,
-//     status: {
-//       confirmed: true,
-//       block_height: 834638,
-//       block_hash:
-//         "000000000000000000025f742c626208ac87e0b7d15054abb4a19ca2d735a54e",
-//       block_time: 1710405325,
-//     },
-//     hex: "02000000016a467d9b469db13cfb2f081a69773d9b96a7c26a606903eb9766133bf931e7ec030000006b4830450221008b776cb507dcdb1ad15bf5c0555add8e8c839ff146e73122c328105c4594a279022000923813f4487b624d1bf98e49ab9da9f2b3dc081e3c11fbf7070439787c2aaa012103bea5d859ec5d95c449c736a0f19a5e52fdacf8b6b96afeaa415cd49f11e6a07cffffffff0178100f0000000000160014a159b3ac03bb4222bbd087e917fca699ca9d3f6800000000",
-//   },
-//   {
-//     txid: "0c43c7f0c6ba6a59de1a66b7932b56c2737ca0efb26bb6d3d5011ec57d50cc00",
-//     version: 2,
-//     locktime: 0,
-//     vin: [
-//       {
-//         txid: "5525faff4e6da81939ad70703cbf5a2129d34dcff217cb869745f6da0c658e0d",
-//         vout: 2,
-//         prevout: {
-//           scriptpubkey: "a91422baf11c8ab5c935dd0c74d9e898a70d8f20693887",
-//           scriptpubkey_asm:
-//             "OP_HASH160 OP_PUSHBYTES_20 22baf11c8ab5c935dd0c74d9e898a70d8f206938 OP_EQUAL",
-//           scriptpubkey_type: "p2sh",
-//           scriptpubkey_address: "34rer1hXqwoXkdkJC9ny6JzHnLSKm6ffQF",
-//           value: 917071,
-//         },
-//         scriptsig: "16001498d452471b13eee620e8d99770761731d1ffb89c",
-//         scriptsig_asm:
-//           "OP_PUSHBYTES_22 001498d452471b13eee620e8d99770761731d1ffb89c",
-//         witness: [
-//           "304402201c1a2e2fea485b9678554c0f698701510604e6c84302a8a84656a9e767570277022070de0e63cd5430a5b9e622f6da033ab13c53d568abd89e3c4099df3c452096be01",
-//           "02742674c19ed520ff01a18d12c624ceb650b75d202b4472e44fd68c642593b061",
-//         ],
-//         is_coinbase: false,
-//         sequence: 4294967293,
-//         inner_redeemscript_asm:
-//           "OP_0 OP_PUSHBYTES_20 98d452471b13eee620e8d99770761731d1ffb89c",
-//       },
-//     ],
-//     vout: [
-//       {
-//         scriptpubkey: "001421c330dfb348135950a3d58f540e4e484951a4fe",
-//         scriptpubkey_asm:
-//           "OP_0 OP_PUSHBYTES_20 21c330dfb348135950a3d58f540e4e484951a4fe",
-//         scriptpubkey_type: "v0_p2wpkh",
-//         scriptpubkey_address: "bc1qy8pnphanfqf4j59r6k84grjwfpy4rf870hfggh",
-//         value: 277000,
-//       },
-//       {
-//         scriptpubkey: "a91422baf11c8ab5c935dd0c74d9e898a70d8f20693887",
-//         scriptpubkey_asm:
-//           "OP_HASH160 OP_PUSHBYTES_20 22baf11c8ab5c935dd0c74d9e898a70d8f206938 OP_EQUAL",
-//         scriptpubkey_type: "p2sh",
-//         scriptpubkey_address: "34rer1hXqwoXkdkJC9ny6JzHnLSKm6ffQF",
-//         value: 635761,
-//       },
-//     ],
-//   },
-// ];
+
+// transactions.set(
+//   "0ad04c1cbefa43938b56ee53e4a9b0c55f96613988042927c5216c490a2e6dc0.json",
+//   transaction
+// );
 
 let validTransactions = [];
 let fee = 0;
-let p2trUnspendable = { value: 0 };
 
 transactions.forEach((transaction, fileName) => {
   // Address Validation
@@ -237,7 +107,7 @@ transactions.forEach((transaction, fileName) => {
   transaction["wTxId"] = wTxId.toString("hex");
 
   // Script and Signature Validation
-  const result = executeScript(transaction, p2trUnspendable);
+  const result = executeScript(transaction);
   if (!result) {
     // console.log("Transaction is invalid in: ", transaction.vin[0].txid);
     return false;
@@ -262,6 +132,7 @@ transactions.forEach((transaction, fileName) => {
   transaction["fee"] = fee;
   validTransactions.push(transaction);
 });
+
 const selectedTransaction = selectTransaction(validTransactions);
 const transactionNumber = serializeVarInt(selectedTransaction.length);
 const coinbaseTx = createCoinbaseTransaction(fee, selectedTransaction);
@@ -272,9 +143,10 @@ const coinbaseWTxId = calculateTxId(serializedWitnessCoinbaseTx);
 coinbaseTx.TxId = coinbaseTxId.toString("hex");
 coinbaseTx.wTxId = coinbaseWTxId.toString("hex");
 selectedTransaction.unshift(coinbaseTx);
+console.log(coinbaseTx);
 const blockHeader = createBlockHeader(selectedTransaction);
 const transactionsTxId = selectedTransaction
-  .map((tx) => tx.TxId)
+  .map((tx) => tx.wTxId)
   .filter(Boolean)
   .join("\n");
 

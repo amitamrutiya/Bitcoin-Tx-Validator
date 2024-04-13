@@ -1,11 +1,18 @@
 import { sha256Double } from "./utils.js";
+import { createHash } from "crypto";
+
+const hash256 = (input) => {
+  const h1 = createHash("sha256").update(Buffer.from(input, "hex")).digest();
+  return createHash("sha256").update(h1).digest("hex");
+};
 
 export function createCoinbaseTransaction(amount, transactions) {
   const witnessReservedValue = Buffer.alloc(32).toString("hex");
   const witnessRootHash = createMerkleRootofwTxid(transactions);
-  const wTxidCommitment = `6a24aa21a9ed${sha256Double(
-    witnessRootHash + witnessReservedValue
-  ).toString("hex")}`;
+  // console.log("merkle root hash: ", witnessRootHash);
+  const witnessCommitment = hash256(witnessRootHash + witnessReservedValue);
+  const scriptPubKeyForWitnessCommitment = `6a24aa21a9ed${witnessCommitment}`;
+  // console.log("wTxidCommitment: ", witnessCommitment);
   const coinbaseTransaction = {};
   coinbaseTransaction.version = 1;
   coinbaseTransaction.locktime = 0;
@@ -28,7 +35,7 @@ export function createCoinbaseTransaction(amount, transactions) {
     },
     {
       value: "0000000000000000",
-      scriptpubkey: wTxidCommitment,
+      scriptpubkey: scriptPubKeyForWitnessCommitment,
     },
   ];
   coinbaseTransaction.marker = "00";
@@ -40,6 +47,7 @@ export function createCoinbaseTransaction(amount, transactions) {
 // Create merkle root
 function createMerkleRootofwTxid(transactions) {
   let merkleTree = [];
+  merkleTree.push(Buffer.alloc(32));
   for (const tx of transactions) {
     merkleTree.push(Buffer.from(tx.wTxId, "hex").reverse());
   }

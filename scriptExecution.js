@@ -1,7 +1,7 @@
 import { isValidSignature } from "./verifySignature.js";
 import { hash160, sha256 } from "./utils.js";
 
-export function executeScript(transaction, p2trUnspendable) {
+export function executeScript(transaction) {
   let allValid = true;
   for (let input of transaction.vin) {
     let stack = [];

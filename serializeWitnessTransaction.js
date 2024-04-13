@@ -40,8 +40,13 @@ export function serializeWitnessTransaction(tx) {
   }
 
   let version = toLittleEndian(tx.version.toString(16).padStart(8, "0"));
-  let marker = "00";
-  let flag = "01";
+  const isSegwit = tx.vin.some((input) => input.witness !== undefined);
+  let marker = "";
+  let flag = "";
+  if (tx.vin.some((input) => input.witness !== undefined)) {
+    marker = "00";
+    flag = "01";
+  }
   let locktime = toLittleEndian(tx.locktime.toString(16).padStart(8, "0"));
   let vinCount = encodeVarInt(tx.vin.length);
   let voutCount = encodeVarInt(tx.vout.length);
@@ -71,20 +76,22 @@ export function serializeWitnessTransaction(tx) {
       return value + scriptPubKey;
     })
     .join("");
-
-  let witness = tx.vin
-    .map((input) => {
-      if (input.witness === undefined) {
-        return "";
-      }
-      let witness = input.witness
-        .map((witness) => {
-          return encodeVarInt(witness.length / 2) + witness;
-        })
-        .join("");
-      return encodeVarInt(input.witness.length) + witness;
-    })
-    .join("");
+  let witness = "";
+  if (isSegwit) {
+    witness = tx.vin
+      .map((input) => {
+        if (input.witness === undefined) {
+          return "00";
+        }
+        let witness = input.witness
+          .map((witness) => {
+            return encodeVarInt(witness.length / 2) + witness;
+          })
+          .join("");
+        return encodeVarInt(input.witness.length) + witness;
+      })
+      .join("");
+  }
   const serializedTransaction =
     version + vinCount + vin + voutCount + vout + locktime;
   const serializedWitnessTransaction = marker + flag + witness;
