@@ -129,7 +129,6 @@ transactions.forEach((transaction, fileName) => {
   }
 });
 // console.log(fee);
-const blockHeader = createBlockHeader(validTransactions);
 const transactionNumber = serializeVarInt(validTransactions.length);
 const coinbaseTx = createCoinbaseTransaction(fee, validTransactions);
 const serializedCoinbaseTx = serializeTransaction(coinbaseTx);
@@ -139,6 +138,7 @@ const coinbaseWTxId = calculateTxId(serializedWitnessCoinbaseTx);
 coinbaseTx.TxId = coinbaseTxId.toString("hex");
 coinbaseTx.wTxId = coinbaseWTxId.toString("hex");
 validTransactions.unshift(coinbaseTx);
+const blockHeader = createBlockHeader(validTransactions);
 const transactionsTxId = validTransactions
   .map((tx) => tx.TxId)
   .filter(Boolean)
