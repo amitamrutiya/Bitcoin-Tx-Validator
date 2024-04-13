@@ -103,7 +103,8 @@ export function createBlockHeader(transactions) {
   const time = dateStringToUnixTime();
   const bits = targetToBits(target);
   let nonce = 0;
-  const merkleroot = createMerkleRootofTxid(transactions);
+  const allTxids = transactions.map((tx) => tx.TxId);
+  const merkleroot = createMerkleRootofTxid(allTxids);
 
   // Block Header (Serialized)
   let header =
