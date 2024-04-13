@@ -44,55 +44,55 @@ function reversebytes(data) {
 }
 
 // Create merkle root
-// function createMerkleRootofTxid(transactions) {
-//   let merkleTree = [];
-//   for (const tx of transactions) {
-//     merkleTree.push(Buffer.from(tx.TxId, "hex").reverse());
-//   }
-//   while (merkleTree.length > 1) {
-//     const nextTree = [];
-//     if (merkleTree.length % 2 === 1) {
-//       merkleTree.push(merkleTree[merkleTree.length - 1]);
-//     }
-//     for (let i = 0; i < merkleTree.length; i += 2) {
-//       const left = merkleTree[i];
-//       const right = merkleTree[i + 1];
-//       const data = Buffer.concat([left, right]);
-//       const hash = sha256Double(data);
-//       nextTree.push(hash);
-//     }
-
-//     merkleTree = nextTree;
-//   }
-//   return merkleTree[0].reverse().toString("hex");
-// }
-const createMerkleRootofTxid = (txids) => {
-  if (txids.length === 0) return null;
-
-  // reverse the txids
-  let level = txids.map((txid) =>
-    Buffer.from(txid, "hex").reverse().toString("hex")
-  );
-
-  while (level.length > 1) {
-    const nextLevel = [];
-
-    for (let i = 0; i < level.length; i += 2) {
-      let pairHash;
-      if (i + 1 === level.length) {
-        // In case of an odd number of elements, duplicate the last one
-        pairHash = hash256(level[i] + level[i]);
-      } else {
-        pairHash = hash256(level[i] + level[i + 1]);
-      }
-      nextLevel.push(pairHash);
+function createMerkleRootofTxid(transactions) {
+  let merkleTree = [];
+  for (const tx of transactions) {
+    merkleTree.push(Buffer.from(tx.TxId, "hex").reverse());
+  }
+  while (merkleTree.length > 1) {
+    const nextTree = [];
+    if (merkleTree.length % 2 === 1) {
+      merkleTree.push(merkleTree[merkleTree.length - 1]);
+    }
+    for (let i = 0; i < merkleTree.length; i += 2) {
+      const left = merkleTree[i];
+      const right = merkleTree[i + 1];
+      const data = Buffer.concat([left, right]);
+      const hash = sha256Double(data);
+      nextTree.push(hash);
     }
 
-    level = nextLevel;
+    merkleTree = nextTree;
   }
+  return merkleTree[0].reverse().toString("hex");
+}
+// const createMerkleRootofTxid = (txids) => {
+//   if (txids.length === 0) return null;
 
-  return level[0];
-};
+//   // reverse the txids
+//   let level = txids.map((txid) =>
+//     Buffer.from(txid, "hex").reverse().toString("hex")
+//   );
+
+//   while (level.length > 1) {
+//     const nextLevel = [];
+
+//     for (let i = 0; i < level.length; i += 2) {
+//       let pairHash;
+//       if (i + 1 === level.length) {
+//         // In case of an odd number of elements, duplicate the last one
+//         pairHash = hash256(level[i] + level[i]);
+//       } else {
+//         pairHash = hash256(level[i] + level[i + 1]);
+//       }
+//       nextLevel.push(pairHash);
+//     }
+
+//     level = nextLevel;
+//   }
+
+//   return level[0];
+// };
 
 export function createBlockHeader(transactions) {
   const target =
@@ -103,9 +103,9 @@ export function createBlockHeader(transactions) {
   const time = dateStringToUnixTime();
   const bits = targetToBits(target);
   let nonce = 0;
-  const allTxids = transactions.map((tx) => tx.TxId);
-  const merkleroot = createMerkleRootofTxid(allTxids);
-  // const merkleroot = createMerkleRootofTxid(transactions);
+  // const allTxids = transactions.map((tx) => tx.TxId);
+  // const merkleroot = createMerkleRootofTxid(allTxids);
+  const merkleroot = createMerkleRootofTxid(transactions);
 
   // Block Header (Serialized)
   let header =
