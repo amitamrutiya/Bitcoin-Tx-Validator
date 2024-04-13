@@ -85,6 +85,12 @@ export function serializeWitnessTransaction(tx) {
       return encodeVarInt(input.witness.length) + witness;
     })
     .join("");
+  const serializedTransaction =
+    version + vinCount + vin + voutCount + vout + locktime;
+  const serializedWitnessTransaction = marker + flag + witness;
+  const weight =
+    4 * serializedTransaction.length + serializedWitnessTransaction.length;
+  tx["weight"] = weight / 2;
   return (
     version +
     marker +
