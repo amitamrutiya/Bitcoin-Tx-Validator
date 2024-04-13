@@ -143,10 +143,9 @@ const coinbaseWTxId = calculateTxId(serializedWitnessCoinbaseTx);
 coinbaseTx.TxId = coinbaseTxId.toString("hex");
 coinbaseTx.wTxId = coinbaseWTxId.toString("hex");
 selectedTransaction.unshift(coinbaseTx);
-console.log(coinbaseTx);
 const blockHeader = createBlockHeader(selectedTransaction);
 const transactionsTxId = selectedTransaction
-  .map((tx) => tx.wTxId)
+  .map((tx) => tx.TxId)
   .filter(Boolean)
   .join("\n");
 

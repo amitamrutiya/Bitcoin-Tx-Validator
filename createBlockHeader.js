@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { sha256Double } from "./utils.js";
+import { createMerkleRoot } from "./utils.js";
 
 function targetToBits(target) {
   let targetBigInt = BigInt("0x" + target);
@@ -43,29 +43,6 @@ function reversebytes(data) {
   return data.match(/../g).reverse().join("");
 }
 
-// Create merkle root
-function createMerkleRootofTxid(transactions) {
-  let merkleTree = [];
-  for (const tx of transactions) {
-    merkleTree.push(Buffer.from(tx.TxId, "hex").reverse());
-  }
-  while (merkleTree.length > 1) {
-    const nextTree = [];
-    if (merkleTree.length % 2 === 1) {
-      merkleTree.push(merkleTree[merkleTree.length - 1]);
-    }
-    for (let i = 0; i < merkleTree.length; i += 2) {
-      const left = merkleTree[i];
-      const right = merkleTree[i + 1];
-      const data = Buffer.concat([left, right]);
-      const hash = sha256Double(data);
-      nextTree.push(hash);
-    }
-
-    merkleTree = nextTree;
-  }
-  return merkleTree[0].reverse().toString("hex");
-}
 
 export function createBlockHeader(transactions) {
   const target =
@@ -76,9 +53,8 @@ export function createBlockHeader(transactions) {
   const time = dateStringToUnixTime();
   const bits = targetToBits(target);
   let nonce = 0;
-  // const allTxids = transactions.map((tx) => tx.TxId);
-  // const merkleroot = createMerkleRootofTxid(allTxids);
-  const merkleroot = createMerkleRootofTxid(transactions);
+  const allTxids = transactions.map((tx) => tx.TxId);
+  const merkleroot = createMerkleRoot(allTxids);
 
   // Block Header (Serialized)
   let header =
@@ -108,4 +84,3 @@ export function createBlockHeader(transactions) {
   header = header + reversebytes(field(nonce, 4));
   return header;
 }
-

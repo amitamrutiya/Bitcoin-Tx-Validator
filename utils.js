@@ -166,3 +166,39 @@ export function parseDer(signature) {
 
   return { r, s };
 }
+
+export function hash256(data) {
+  const h1 = crypto
+    .createHash("sha256")
+    .update(Buffer.from(data, "hex"))
+    .digest();
+  return crypto.createHash("sha256").update(h1).digest("hex");
+}
+
+export function createMerkleRoot(txids) {
+  if (txids.length === 0) return null;
+
+  // reverse the txids
+  let level = txids.map((txid) =>
+    Buffer.from(txid, "hex").reverse().toString("hex")
+  );
+
+  while (level.length > 1) {
+    const nextLevel = [];
+
+    for (let i = 0; i < level.length; i += 2) {
+      let pairHash;
+      if (i + 1 === level.length) {
+        // In case of an odd number of elements, duplicate the last one
+        pairHash = hash256(level[i] + level[i]);
+      } else {
+        pairHash = hash256(level[i] + level[i + 1]);
+      }
+      nextLevel.push(pairHash);
+    }
+
+    level = nextLevel;
+  }
+
+  return level[0];
+}
