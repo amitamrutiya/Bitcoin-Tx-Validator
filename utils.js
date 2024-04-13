@@ -202,3 +202,8 @@ export function createMerkleRoot(txids) {
 
   return level[0];
 }
+
+// Reverse the order of bytes (often happens when working with raw bitcoin data)
+export function reversebytes(data) {
+  return data.match(/../g).reverse().join("");
+}

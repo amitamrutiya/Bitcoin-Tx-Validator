@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { createMerkleRoot } from "./utils.js";
+import { createMerkleRoot, reversebytes } from "./utils.js";
 
 function targetToBits(target) {
   let targetBigInt = BigInt("0x" + target);
@@ -38,12 +38,6 @@ function field(data, size) {
     .padStart(size * 2, "0");
 }
 
-// Reverse the order of bytes (often happens when working with raw bitcoin data)
-function reversebytes(data) {
-  return data.match(/../g).reverse().join("");
-}
-
-
 export function createBlockHeader(transactions) {
   const target =
     "0000ffff00000000000000000000000000000000000000000000000000000000";
@@ -60,7 +54,7 @@ export function createBlockHeader(transactions) {
   let header =
     reversebytes(field(version, 4)) +
     reversebytes(prevblock) +
-    reversebytes(merkleroot) +
+    merkleroot +
     reversebytes(field(time, 4)) +
     reversebytes(bits);
 

@@ -7,7 +7,7 @@ export function selectTransaction(transactions) {
 
   let finalTransactions = [];
   const maxFee = 20616923;
-  const maxWeight = 3999000;
+  const maxWeight = 4000000;
   let fee = 0;
   let weight = 0;
 
