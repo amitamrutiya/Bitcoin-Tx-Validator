@@ -16,15 +16,7 @@ fs.readdirSync(mempoolPath).forEach((filename) => {
   const transaction = JSON.parse(
     fs.readFileSync(path.join(mempoolPath, filename), "utf8")
   );
-  // if (
-  // transaction.vin.length === 2 &&
-  // transaction.vin[0].witness === undefined &&
-  // transaction.vin[0].prevout.scriptpubkey_type === "p2pkh" &&
-  // transaction.vin[1].witness === undefined &&
-  // transaction.vin[1].prevout.scriptpubkey_type === "p2pkh"
-  // ) {
   transactions.set(filename, transaction);
-  // }
 });
 
 // const transaction = {
