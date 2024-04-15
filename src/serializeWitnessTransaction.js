@@ -1,44 +1,6 @@
+import { toLittleEndian, serializeVarInt } from "./utils.js";
+
 export function serializeWitnessTransaction(tx) {
-  function toLittleEndian(hex) {
-    return Buffer.from(hex, "hex").reverse().toString("hex");
-  }
-
-  function encodeUInt32LE(value) {
-    const buf = Buffer.alloc(4);
-    buf.writeUInt32LE(value, 0);
-    return buf.toString("hex");
-  }
-
-  function encodeUInt64LE(value) {
-    const buf = Buffer.alloc(8);
-    buf.writeBigUInt64LE(BigInt(value), 0);
-    return buf.toString("hex");
-  }
-
-  function encodeVarInt(value) {
-    if (value < 0xfd) {
-      return encodeUInt8(value);
-    } else if (value <= 0xffff) {
-      return "fd" + encodeUInt16LE(value);
-    } else if (value <= 0xffffffff) {
-      return "fe" + encodeUInt32LE(value);
-    } else {
-      return "ff" + encodeUInt64LE(value);
-    }
-  }
-
-  function encodeUInt8(value) {
-    const buf = Buffer.alloc(1);
-    buf.writeUInt8(value, 0);
-    return buf.toString("hex");
-  }
-
-  function encodeUInt16LE(value) {
-    const buf = Buffer.alloc(2);
-    buf.writeUInt16LE(value, 0);
-    return buf.toString("hex");
-  }
-
   let version = toLittleEndian(tx.version.toString(16).padStart(8, "0"));
   const isSegwit = tx.vin.some((input) => input.witness !== undefined);
   let marker = "";
@@ -48,8 +10,8 @@ export function serializeWitnessTransaction(tx) {
     flag = "01";
   }
   let locktime = toLittleEndian(tx.locktime.toString(16).padStart(8, "0"));
-  let vinCount = encodeVarInt(tx.vin.length);
-  let voutCount = encodeVarInt(tx.vout.length);
+  let vinCount = serializeVarInt(tx.vin.length).toString("hex");
+  let voutCount = serializeVarInt(tx.vout.length).toString("hex");
 
   let vin = tx.vin
     .map((input) => {
@@ -57,7 +19,9 @@ export function serializeWitnessTransaction(tx) {
       let vout = toLittleEndian(input.vout.toString(16).padStart(8, "0"));
       let scriptSig;
       if (input.scriptsig) {
-        scriptSig = encodeVarInt(input.scriptsig.length / 2) + input.scriptsig;
+        scriptSig =
+          serializeVarInt(input.scriptsig.length / 2).toString("hex") +
+          input.scriptsig;
       } else {
         scriptSig = "00";
       }
@@ -72,7 +36,8 @@ export function serializeWitnessTransaction(tx) {
     .map((output) => {
       let value = toLittleEndian(output.value.toString(16).padStart(16, "0"));
       let scriptPubKey =
-        encodeVarInt(output.scriptpubkey.length / 2) + output.scriptpubkey;
+        serializeVarInt(output.scriptpubkey.length / 2).toString("hex") +
+        output.scriptpubkey;
       return value + scriptPubKey;
     })
     .join("");
@@ -85,10 +50,12 @@ export function serializeWitnessTransaction(tx) {
         }
         let witness = input.witness
           .map((witness) => {
-            return encodeVarInt(witness.length / 2) + witness;
+            return (
+              serializeVarInt(witness.length / 2).toString("hex") + witness
+            );
           })
           .join("");
-        return encodeVarInt(input.witness.length) + witness;
+        return serializeVarInt(input.witness.length).toString("hex") + witness;
       })
       .join("");
   }

@@ -39,6 +39,7 @@ transactions.forEach((transaction, fileName) => {
   const wTxId = calculateTxId(serializedWitnessTransaction);
   const getFileName = crypto.createHash("sha256").update(TxId).digest("hex");
   if (fileName !== getFileName + ".json") {
+    console.log("Invalid TxId")
     return;
   }
   transaction["TxId"] = TxId.toString("hex");
