@@ -1,6 +1,6 @@
 import { bech32 } from "bech32";
 import bs58 from "bs58";
-import crypto from "crypto";
+import { hash256Buffer } from "./utils";
 
 function generateAddress(publicKeyHash, transactionType) {
   if (transactionType === "p2pkh") {
@@ -24,12 +24,7 @@ function generateLegacyAddress(publicKeyHash, versionByte) {
     PublicKeyHash,
   ]);
 
-  // Double SHA-256 hash
-  const hash1 = crypto
-    .createHash("sha256")
-    .update(extendedPublicKeyHash1)
-    .digest();
-  const hash2 = crypto.createHash("sha256").update(hash1).digest();
+  const hash2 = hash256Buffer(extendedPublicKeyHash1);
 
   // Take the first 4 bytes as checksum
   const checksum = hash2.slice(0, 4);
