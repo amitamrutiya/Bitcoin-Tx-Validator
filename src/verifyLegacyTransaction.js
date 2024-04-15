@@ -13,14 +13,12 @@ export default function verifyLegacyTransaction(
   publicKeys
 ) {
   const serialized = serializeLegacyTransaction(transaction, input, signatures);
-  // console.log(serialized.toString("hex"));
   let validCount = 0;
   for (let signature of signatures) {
     for (let publicKey of publicKeys) {
       const sighashType = Buffer.alloc(4);
       sighashType.writeUInt32LE(parseInt(signature.slice(-2), 16), 0);
       const serializedWithSighash = Buffer.concat([serialized, sighashType]);
-      // console.log(serializedWithSighash.toString("hex"));
       const hashResult = sha256Double(serializedWithSighash);
       const result = verifySignature(
         hashResult.toString("hex"),

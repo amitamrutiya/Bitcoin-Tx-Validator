@@ -204,6 +204,6 @@ export function createMerkleRoot(txids) {
 }
 
 // Reverse the order of bytes (often happens when working with raw bitcoin data)
-export function reversebytes(data) {
-  return data.match(/../g).reverse().join("");
+export function toLittleEndian(hex) {
+  return Buffer.from(hex, "hex").reverse().toString("hex");
 }

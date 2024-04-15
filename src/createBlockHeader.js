@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { createMerkleRoot, reversebytes } from "./utils.js";
+import { createMerkleRoot, toLittleEndian } from "./utils.js";
 
 function targetToBits(target) {
   let targetBigInt = BigInt("0x" + target);
@@ -52,16 +52,16 @@ export function createBlockHeader(transactions) {
 
   // Block Header (Serialized)
   let header =
-    reversebytes(field(version, 4)) +
-    reversebytes(prevblock) +
+    toLittleEndian(field(version, 4)) +
+    toLittleEndian(prevblock) +
     merkleroot +
-    reversebytes(field(time, 4)) +
-    reversebytes(bits);
+    toLittleEndian(field(time, 4)) +
+    toLittleEndian(bits);
 
   while (true) {
     // hash the block header
-    const attempt = header + reversebytes(field(nonce, 4));
-    const result = reversebytes(hash256(attempt));
+    const attempt = header + toLittleEndian(field(nonce, 4));
+    const result = toLittleEndian(hash256(attempt));
 
     // end if we get a block hash below the target
     if (BigInt("0x" + result) < BigInt("0x" + target)) {
@@ -71,6 +71,6 @@ export function createBlockHeader(transactions) {
     // increment the nonce and try again...
     nonce++;
   }
-  header = header + reversebytes(field(nonce, 4));
+  header = header + toLittleEndian(field(nonce, 4));
   return header;
 }

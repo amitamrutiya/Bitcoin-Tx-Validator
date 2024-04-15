@@ -31,7 +31,6 @@ export function executeScript(transaction) {
         ...input.prevout.scriptpubkey_asm.split(" "),
       ];
       scriptTokens = script;
-      // console.log(scriptTokens);
     } else if (
       input.prevout.scriptpubkey_type === "p2sh" &&
       input.witness !== undefined &&
@@ -64,7 +63,6 @@ export function executeScript(transaction) {
         scriptsig +
         " " +
         input.prevout.scriptpubkey_asm;
-      // console.log(script);
       scriptTokens = script.split(" ");
     } else if (
       input.prevout.scriptpubkey_type === "v0_p2wsh" &&
