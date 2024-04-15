@@ -1,6 +1,6 @@
 import { bech32 } from "bech32";
 import bs58 from "bs58";
-import { hash256Buffer } from "./utils";
+import { hash256Buffer } from "./utils.js";
 
 function generateAddress(publicKeyHash, transactionType) {
   if (transactionType === "p2pkh") {
