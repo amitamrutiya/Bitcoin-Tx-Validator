@@ -1,8 +1,8 @@
 import {
   serializeUInt32LE,
-  serializeValue,
+  serializeUInt64LE,
   serializeVarInt,
-  sha256Double,
+  hash256Buffer,
   verifySignature,
 } from "./utils.js";
 
@@ -19,7 +19,7 @@ export default function verifyLegacyTransaction(
       const sighashType = Buffer.alloc(4);
       sighashType.writeUInt32LE(parseInt(signature.slice(-2), 16), 0);
       const serializedWithSighash = Buffer.concat([serialized, sighashType]);
-      const hashResult = sha256Double(serializedWithSighash);
+      const hashResult = hash256Buffer(serializedWithSighash);
       const result = verifySignature(
         hashResult.toString("hex"),
         signature,
@@ -89,7 +89,7 @@ function serializeInputs(inputs, input, anyOneCanPayFlag) {
 function serializeOutputs(outputs) {
   let serialized = serializeVarInt(outputs.length).toString("hex");
   outputs.forEach((output) => {
-    serialized += serializeValue(output.value).toString("hex");
+    serialized += serializeUInt64LE(output.value).toString("hex");
     serialized += serializeVarInt(output.scriptpubkey.length / 2).toString(
       "hex"
     );

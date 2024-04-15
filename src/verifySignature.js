@@ -29,13 +29,11 @@ export function isValidSignature(
     if (!isValid) {
       return false;
     }
-    // console.log(`Valid signature in ${outerInput.txid}`);
     return true;
   } else {
     for (let input of transaction.vin) {
       input.scriptsig = "";
     }
-    // console.log(outerInput)
     if (outerInput.prevout.scriptpubkey_type === "p2sh") {
       const scriptsig_asm = outerInput.scriptsig_asm.split(" ");
       outerInput.scriptsig = scriptsig_asm[scriptsig_asm.length - 1];
@@ -44,7 +42,6 @@ export function isValidSignature(
     } else {
       return false;
     }
-    // console.log(transaction);
     const isValid = verifyLegacyTransaction(
       transaction,
       outerInput,
@@ -54,7 +51,6 @@ export function isValidSignature(
     if (!isValid) {
       return false;
     }
-    // console.log(`Valid signature in ${outerInput.txid}`);
     return true;
   }
 }

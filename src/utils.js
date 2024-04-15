@@ -9,17 +9,17 @@ export function serializeUInt32LE(value) {
   return buffer;
 }
 
-export function sha256Double(buffer) {
-  return crypto
-    .createHash("sha256")
-    .update(crypto.createHash("sha256").update(buffer).digest())
-    .digest();
+export function hash256Buffer(buffer) {
+  const hash1 = crypto.createHash("sha256").update(buffer).digest();
+  const hash2 = crypto.createHash("sha256").update(hash1).digest();
+  return hash2;
 }
 
-export function serializeValue(value) {
-  const buffer = Buffer.alloc(8);
-  buffer.writeBigUInt64LE(BigInt(value));
-  return buffer;
+export function hash256(data) {
+  const binary = Buffer.from(data, "hex");
+  const hash1 = crypto.createHash("sha256").update(binary).digest();
+  const hash2 = crypto.createHash("sha256").update(hash1).digest("hex");
+  return hash2;
 }
 
 export function serializeVarInt(value) {
@@ -165,14 +165,6 @@ export function parseDer(signature) {
   );
 
   return { r, s };
-}
-
-export function hash256(data) {
-  const h1 = crypto
-    .createHash("sha256")
-    .update(Buffer.from(data, "hex"))
-    .digest();
-  return crypto.createHash("sha256").update(h1).digest("hex");
 }
 
 export function createMerkleRoot(txids) {

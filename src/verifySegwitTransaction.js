@@ -1,7 +1,7 @@
 import {
-  sha256Double,
+  hash256Buffer,
   serializeUInt32LE,
-  serializeValue,
+  serializeUInt64LE,
   verifySignature,
   serializeVarInt,
 } from "./utils.js";
@@ -19,8 +19,7 @@ export default function verifySegwitTransaction(
       const sighashType = Buffer.alloc(4);
       sighashType.writeUInt32LE(parseInt(signature.slice(-2), 16), 0);
       const serializedWithSighash = Buffer.concat([serialized, sighashType]);
-      // console.log(serializedWithSighash.toString("hex"));
-      const hashResult = sha256Double(serializedWithSighash);
+      const hashResult = hash256Buffer(serializedWithSighash);
 
       const result = verifySignature(
         hashResult.toString("hex"),
@@ -66,7 +65,7 @@ function serializeSegwitTransaction(transaction, input) {
   const hashSequences = hashSequence(transaction, input, anyOneCanPayFlag);
   const outpoint = serializeOutpoint(input);
   const scriptCode = serializeScriptCode(input);
-  const value = serializeValue(input.prevout.value);
+  const value = serializeUInt64LE(input.prevout.value);
   const nSequence = serializeUInt32LE(input.sequence);
   const hashOutput = hashOutputs(
     transaction,
@@ -75,16 +74,6 @@ function serializeSegwitTransaction(transaction, input) {
     anyOneCanPayFlag
   );
   const nLocktime = serializeUInt32LE(transaction.locktime);
-  // console.log(version.toString("hex"));
-  // console.log(hashPrevout.toString("hex"));
-  // console.log(hashSequences.toString("hex"));
-  // console.log(outpoint.toString("hex"));
-  // console.log(scriptCode.toString("hex"));
-  // console.log(value.toString("hex"));
-  // console.log(nSequence.toString("hex"));
-  // console.log(hashOutput.toString("hex"));
-  // console.log(nLocktime.toString("hex"));
-  // console.log(sighashType.toString("hex"));
   return Buffer.concat([
     version,
     hashPrevout,
@@ -131,7 +120,7 @@ function hashPrevouts(transaction, anyOneCanPayFlag) {
   } else {
     const outpoints = transaction.vin.map((input) => serializeOutpoint(input));
     const buffer = Buffer.concat(outpoints);
-    return sha256Double(buffer);
+    return hash256Buffer(buffer);
   }
 }
 
@@ -143,21 +132,21 @@ function hashSequence(transaction, input, anyOneCanPayFlag) {
     serializeUInt32LE(input.sequence)
   );
   const buffer = Buffer.concat(sequences);
-  return sha256Double(buffer);
+  return hash256Buffer(buffer);
 }
 
 function hashOutputs(transaction, sighashType, inputIndex, anyOneCanPayFlag) {
   let outputs;
   if (sighashType === "SINGLE" && inputIndex < transaction.vout.length) {
     const output = transaction.vout[inputIndex];
-    const value = serializeValue(output.value);
+    const value = serializeUInt64LE(output.value);
     const scriptPubKeySize = Buffer.alloc(1);
     scriptPubKeySize.writeUInt8(output.scriptpubkey.length / 2);
     const scriptPubKey = Buffer.from(output.scriptpubkey, "hex");
     outputs = [Buffer.concat([value, scriptPubKeySize, scriptPubKey])];
   } else if (sighashType !== "SINGLE" && sighashType !== "NONE") {
     outputs = transaction.vout.map((output) => {
-      const value = serializeValue(output.value);
+      const value = serializeUInt64LE(output.value);
       const scriptPubKeySize = Buffer.alloc(1);
       scriptPubKeySize.writeUInt8(output.scriptpubkey.length / 2);
       const scriptPubKey = Buffer.from(output.scriptpubkey, "hex");
@@ -167,5 +156,5 @@ function hashOutputs(transaction, sighashType, inputIndex, anyOneCanPayFlag) {
     return Buffer.alloc(32);
   }
   const buffer = Buffer.concat(outputs);
-  return sha256Double(buffer);
+  return hash256Buffer(buffer);
 }
