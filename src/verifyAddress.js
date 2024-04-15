@@ -1,6 +1,6 @@
-import crypto from "crypto";
-import bs58 from "bs58";
 import { bech32 } from "bech32";
+import bs58 from "bs58";
+import crypto from "crypto";
 
 function generateAddress(publicKeyHash, transactionType) {
   if (transactionType === "p2pkh") {

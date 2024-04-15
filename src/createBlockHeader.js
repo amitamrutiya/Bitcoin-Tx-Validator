@@ -63,12 +63,8 @@ export function createBlockHeader(transactions) {
     const attempt = header + reversebytes(field(nonce, 4));
     const result = reversebytes(hash256(attempt));
 
-    // show result
-    // console.log(`${nonce}: Block Hash : ${result}`);
-
     // end if we get a block hash below the target
     if (BigInt("0x" + result) < BigInt("0x" + target)) {
-      // console.log(`Block Header: ${attempt}`);
       break;
     }
 

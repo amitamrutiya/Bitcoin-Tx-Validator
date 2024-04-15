@@ -1,5 +1,5 @@
-import { isValidSignature } from "./verifySignature.js";
 import { hash160, sha256 } from "./utils.js";
+import { isValidSignature } from "./verifySignature.js";
 
 export function executeScript(transaction) {
   let allValid = true;
@@ -93,7 +93,6 @@ export function executeScript(transaction) {
     } else if (input.prevout.scriptpubkey_type === "v1_p2tr") {
       return false;
     } else {
-      // console.log("Unsupported script type in " + input.txid);
       return false;
     }
     while (scriptTokens.length > 0) {
@@ -161,8 +160,6 @@ export function executeScript(transaction) {
         for (let i = 0; i < m; i++) {
           signatures.push(stack.pop());
         }
-        // console.log("Public keys: ", publicKeys);
-        // console.log("Signatures: ", signatures);
         const isValid = isValidSignature(
           transaction,
           input,
@@ -196,8 +193,6 @@ export function executeScript(transaction) {
       } else {
         stack.push(token);
       }
-      // Log the state of the stack
-      // console.log(`After executing ${token}, stack is: `, stack);
     }
 
     // Check if the stack is empty and contains only true values

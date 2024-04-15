@@ -1,7 +1,7 @@
 import {
   serializeUInt32LE,
-  serializeVarInt,
   serializeValue,
+  serializeVarInt,
   sha256Double,
   verifySignature,
 } from "./utils.js";

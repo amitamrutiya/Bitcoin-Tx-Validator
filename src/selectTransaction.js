@@ -34,7 +34,5 @@ export function selectTransaction(transactions) {
     }
   }
 
-  console.log("fee: ", fee);
-  console.log("weight: ", weight);
   return finalTransactions;
 }
