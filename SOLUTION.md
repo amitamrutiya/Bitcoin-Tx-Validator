@@ -265,12 +265,12 @@ Witness Transaction ID Calculation:
 ```vb
   Define inputTotal as the sum of all input.prevout.value in transaction.vin
   Define outputTotal as the sum of all output.value in transaction.vout
-  If outputTotal is greater than inputTotal
-    Print "Output total exceeds input total"
-    Return false
-  Define fee as inputTotal minus outputTotal
-  Add fee to transaction
-  Add transaction to validTransactions
+    If outputTotal is greater than inputTotal
+      Print "Output total exceeds input total"
+      Return false
+    Define fee as inputTotal minus outputTotal
+    Add fee to transaction
+    Add transaction to validTransactions
   ```
 
 ### Select Transactions:
@@ -309,16 +309,16 @@ Witness Transaction ID Calculation:
 ```vb
   Define function createBlockHeader with parameter transactions
   Define target, version, prevblock, and initialize nonce to 0
-  Get current time in Unix format
-  Convert target to bits format
-  Map transactions to their TxId
-  Create merkleroot using the list of TxIds
-  Initialize header with version, prevblock, merkleroot, time, and bits, all in little endian format
-  While true
-    Concatenate header and nonce in little endian format, hash the result, and convert to little endian format
-    If the result is less than target, break the loop
-    Increment nonce
-  Append nonce in little endian format to header
+    Get current time in Unix format
+    Convert target to bits format
+    Map transactions to their TxId
+    Create merkleroot using the list of TxIds
+    Initialize header with version, prevblock, merkleroot, time, and bits, all in little endian format
+    While true
+      Concatenate header and nonce in little endian format, hash the result, and convert to little endian format
+      If the result is less than target, break the loop
+      Increment nonce
+    Append nonce in little endian format to header
   Return header
 ```
 
@@ -326,9 +326,9 @@ Witness Transaction ID Calculation:
 
 ```vb
   Define function createOutputFile with parameters blockHeader, coinbaseTransaction, transactions
-  Initialize output as an empty string
-  Append blockHeader, coinbaseTransaction, and all transaction IDs to output
-  Write output to output.txt
+    Initialize output as an empty string
+    Append blockHeader, coinbaseTransaction, and all transaction IDs to output
+    Write output to output.txt
 ```
 
 
