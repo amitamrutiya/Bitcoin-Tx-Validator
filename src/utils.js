@@ -138,35 +138,6 @@ export function calculateTxId(serializedTransaction) {
   return reversedHash;
 }
 
-export function parseDer(signature) {
-  // Convert the DER signature from hex string to Buffer
-  const signatureBuffer = Buffer.from(signature, "hex");
-
-  // Find the start of the first integer (r)
-  let rStart = 4; // Skip the header bytes and the length byte for r
-
-  // Get the length of the first integer (r)
-  const rLength = signatureBuffer[3];
-
-  // Extract the bytes for the first integer (r)
-  const r = BigInt(
-    "0x" + signatureBuffer.slice(rStart, rStart + rLength).toString("hex")
-  );
-
-  // Find the start of the second integer (s)
-  let sStart = rStart + 2 + rLength; // Skip the header bytes and the length byte for s
-
-  // Get the length of the second integer (s)
-  const sLength = signatureBuffer[rStart + 1 + rLength];
-
-  // Extract the bytes for the second integer (s)
-  const s = BigInt(
-    "0x" + signatureBuffer.slice(sStart, sStart + sLength).toString("hex")
-  );
-
-  return { r, s };
-}
-
 export function createMerkleRoot(txids) {
   if (txids.length === 0) return null;
 

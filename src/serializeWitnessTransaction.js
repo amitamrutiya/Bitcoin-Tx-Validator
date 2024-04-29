@@ -1,18 +1,30 @@
 import { toLittleEndian, serializeVarInt } from "./utils.js";
 
+// Function to serialize a witness transaction
 export function serializeWitnessTransaction(tx) {
+  // Convert version to little endian format
   let version = toLittleEndian(tx.version.toString(16).padStart(8, "0"));
+
+  // Check if the transaction is SegWit
   const isSegwit = tx.vin.some((input) => input.witness !== undefined);
+
   let marker = "";
   let flag = "";
-  if (tx.vin.some((input) => input.witness !== undefined)) {
+
+  // If transaction is SegWit, set marker and flag
+  if (isSegwit) {
     marker = "00";
     flag = "01";
   }
+
+  // Convert locktime to little endian format
   let locktime = toLittleEndian(tx.locktime.toString(16).padStart(8, "0"));
+
+  // Serialize the number of inputs and outputs
   let vinCount = serializeVarInt(tx.vin.length).toString("hex");
   let voutCount = serializeVarInt(tx.vout.length).toString("hex");
 
+  // Serialize each input
   let vin = tx.vin
     .map((input) => {
       let txid = toLittleEndian(input.txid);
@@ -32,6 +44,7 @@ export function serializeWitnessTransaction(tx) {
     })
     .join("");
 
+  // Serialize each output
   let vout = tx.vout
     .map((output) => {
       let value = toLittleEndian(output.value.toString(16).padStart(16, "0"));
@@ -41,7 +54,10 @@ export function serializeWitnessTransaction(tx) {
       return value + scriptPubKey;
     })
     .join("");
+
   let witness = "";
+
+  // If transaction is SegWit, serialize each witness
   if (isSegwit) {
     witness = tx.vin
       .map((input) => {
@@ -59,12 +75,22 @@ export function serializeWitnessTransaction(tx) {
       })
       .join("");
   }
+
+  // Concatenate all serialized parts to form the complete transaction
   const serializedTransaction =
     version + vinCount + vin + voutCount + vout + locktime;
+
+  // Concatenate all serialized parts to form the complete witness transaction
   const serializedWitnessTransaction = marker + flag + witness;
+
+  // Calculate the weight of the transaction
   const weight =
     4 * serializedTransaction.length + serializedWitnessTransaction.length;
+
+  // Add the weight to the transaction
   tx["weight"] = weight / 2;
+
+  // Return the serialized transaction
   return (
     version +
     marker +

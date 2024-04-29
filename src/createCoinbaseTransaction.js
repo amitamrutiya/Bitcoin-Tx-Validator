@@ -1,17 +1,31 @@
 import { createMerkleRoot, hash256 } from "./utils.js";
 
+// Function to create a coinbase transaction
 export function createCoinbaseTransaction(amount, transactions) {
+  // Create a 32-byte buffer and convert it to a hexadecimal string
   const witnessReservedValue = Buffer.alloc(32).toString("hex");
+
+  // Map over the transactions and get the witness transaction ID (wTxId) of each
   let wtxids = transactions.map((tx) => tx.wTxId);
+
+  // Add the witness reserved value to the start of the wtxids array
   wtxids.unshift(witnessReservedValue);
+
+  // Create the Merkle root of the wtxids
   const witnessRootHash = createMerkleRoot(wtxids);
+
+  // Hash the concatenation of the witness root hash and the witness reserved value
   const witnessCommitment = hash256(witnessRootHash + witnessReservedValue);
+
+  // Create the script public key for the witness commitment
   const scriptPubKeyForWitnessCommitment = `6a24aa21a9ed${witnessCommitment}`;
+
+  // Define the structure of the coinbase transaction
   const coinbaseTransaction = {
     version: 1,
     locktime: 0,
     marker: "00",
-    flat : "01",
+    flat: "01",
     vin: [
       {
         txid: "0000000000000000000000000000000000000000000000000000000000000000",
@@ -35,5 +49,6 @@ export function createCoinbaseTransaction(amount, transactions) {
       },
     ],
   };
+  // Return the coinbase transaction
   return coinbaseTransaction;
 }

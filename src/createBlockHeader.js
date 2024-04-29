@@ -1,6 +1,6 @@
-import crypto from "crypto";
-import { createMerkleRoot, toLittleEndian } from "./utils.js";
+import { createMerkleRoot, toLittleEndian, hash256 } from "./utils.js";
 
+// Converts the target difficulty into bits for the block header
 function targetToBits(target) {
   let targetBigInt = BigInt("0x" + target);
   let exponent = 0;
@@ -19,13 +19,7 @@ function targetToBits(target) {
   return bitsBigInt.toString(16).padStart(8, "0");
 }
 
-function hash256(data) {
-  const binary = Buffer.from(data, "hex");
-  const hash1 = crypto.createHash("sha256").update(binary).digest();
-  const hash2 = crypto.createHash("sha256").update(hash1).digest("hex");
-  return hash2;
-}
-
+// Returns the current Unix timestamp
 function dateStringToUnixTime() {
   var date = new Date();
   return Math.floor(date.getTime() / 1000);
@@ -38,19 +32,28 @@ function field(data, size) {
     .padStart(size * 2, "0");
 }
 
+// Creates a new block header for a set of transactions
 export function createBlockHeader(transactions) {
+  // Define the target difficulty for the block
   const target =
     "0000ffff00000000000000000000000000000000000000000000000000000000";
+  // Define the version of the block
   const version = "4";
+  // Define the hash of the previous block
   const prevblock =
     "0000000000000000000000000000000000000000000000000000000000000000";
+  // Get the current time
   const time = dateStringToUnixTime();
+  // Convert the target difficulty to bits
   const bits = targetToBits(target);
+  // Initialize the nonce
   let nonce = 0;
+  // Get all transaction IDs
   const allTxids = transactions.map((tx) => tx.TxId);
+  // Create the Merkle root of the transactions
   const merkleroot = createMerkleRoot(allTxids);
 
-  // Block Header (Serialized)
+  // Create the block header
   let header =
     toLittleEndian(field(version, 4)) +
     toLittleEndian(prevblock) +
@@ -58,19 +61,22 @@ export function createBlockHeader(transactions) {
     toLittleEndian(field(time, 4)) +
     toLittleEndian(bits);
 
+  // Start mining the block
   while (true) {
-    // hash the block header
+    // Hash the block header with the current nonce
     const attempt = header + toLittleEndian(field(nonce, 4));
     const result = toLittleEndian(hash256(attempt));
 
-    // end if we get a block hash below the target
+    // If the hash is less than the target, the block has been successfully mined
     if (BigInt("0x" + result) < BigInt("0x" + target)) {
       break;
     }
 
-    // increment the nonce and try again...
+    // If the hash is not less than the target, increment the nonce and try again
     nonce++;
   }
+  // Add the successful nonce to the block header
   header = header + toLittleEndian(field(nonce, 4));
+  // Return the block header
   return header;
 }

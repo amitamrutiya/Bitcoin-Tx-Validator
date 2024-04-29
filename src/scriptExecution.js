@@ -1,6 +1,7 @@
 import { hash160, sha256 } from "./utils.js";
 import { isValidSignature } from "./verifySignature.js";
 
+// Function to execute a script for a transaction
 export function executeScript(transaction) {
   let allValid = true;
   for (let input of transaction.vin) {
@@ -8,7 +9,9 @@ export function executeScript(transaction) {
     let script = "";
     let scriptTokens = [];
 
+    // Handle different types of scripts
     if (input.prevout.scriptpubkey_type === "p2pkh") {
+      // Pay-to-Public-Key-Hash (P2PKH)
       script = input.scriptsig_asm + " " + input.prevout.scriptpubkey_asm;
       scriptTokens = script.split(" ");
     } else if (
@@ -16,6 +19,7 @@ export function executeScript(transaction) {
       input.witness === undefined &&
       !input.inner_redeemscript_asm.split(" ").includes("OP_CSV")
     ) {
+      // Pay-to-Script-Hash (P2SH)
       const scriptsig_asm = input.scriptsig_asm.split(" ");
       const inner_redeemscript = [
         scriptsig_asm[scriptsig_asm.length - 2],
@@ -36,6 +40,7 @@ export function executeScript(transaction) {
       input.witness !== undefined &&
       input.witness.length === 2
     ) {
+      // P2SH with witness data
       script =
         "OP_CHECKSIG" +
         " " +
@@ -54,6 +59,7 @@ export function executeScript(transaction) {
       !input.inner_witnessscript_asm.split(" ").includes("OP_CSV") &&
       !input.inner_witnessscript_asm.split(" ").includes("OP_DROP")
     ) {
+      // P2SH with multiple witness data
       const signatures = input.witness.slice(1, -1);
       const scriptsig = input.scriptsig_asm.split(" ")[1];
       stack.push(...signatures);
@@ -69,6 +75,7 @@ export function executeScript(transaction) {
       input.witness !== undefined &&
       input.witness[0] === ""
     ) {
+      // Pay-to-Witness-Script-Hash (P2WSH)
       const signatures = input.witness.slice(1, -1);
       const scriptsig = input.witness[input.witness.length - 1];
       stack.push(...signatures);
@@ -81,6 +88,7 @@ export function executeScript(transaction) {
         " OP_EQUAL";
       scriptTokens = script.split(" ");
     } else if (input.prevout.scriptpubkey_type === "v0_p2wpkh") {
+      // Pay-to-Witness-Public-Key-Hash (P2WPKH)
       const pkh = input.prevout.scriptpubkey_asm.split(" ")[2];
       stack.push(input.witness[0]);
       stack.push(input.witness[1]);
@@ -88,11 +96,11 @@ export function executeScript(transaction) {
       script = "OP_DUP OP_HASH160 " + pkh + " OP_EQUALVERIFY OP_CHECKSIG";
 
       scriptTokens = script.split(" ");
-    } else if (input.prevout.scriptpubkey_type === "v1_p2tr") {
-      return false;
     } else {
       return false;
     }
+    
+    // Execute the script
     while (scriptTokens.length > 0) {
       const token = scriptTokens.shift();
       if (token === "OP_CHECKSIG") {

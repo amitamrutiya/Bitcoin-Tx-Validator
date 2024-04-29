@@ -2,6 +2,7 @@ import { bech32 } from "bech32";
 import bs58 from "bs58";
 import { hash256Buffer } from "./utils.js";
 
+// Function to generate address based on transaction type
 function generateAddress(publicKeyHash, transactionType) {
   if (transactionType === "p2pkh") {
     return generateLegacyAddress(publicKeyHash, 0x00);
@@ -16,6 +17,8 @@ function generateAddress(publicKeyHash, transactionType) {
     return convertToBech32(publicKeyHash, 1);
   }
 }
+
+// Function to generate legacy address (P2PKH and P2SH)
 function generateLegacyAddress(publicKeyHash, versionByte) {
   const PublicKeyHash = Buffer.from(publicKeyHash, "hex");
   // Prepend version byte to the public key hash
@@ -41,6 +44,7 @@ function generateLegacyAddress(publicKeyHash, versionByte) {
   return address;
 }
 
+// Function to convert public key hash to Bech32 address
 function convertToBech32(PKH, witness) {
   const witnessVersion = witness; // 5 bits prefix for PKH
   const words = bech32.toWords(Buffer.from(PKH, "hex"));
@@ -48,6 +52,7 @@ function convertToBech32(PKH, witness) {
   return address;
 }
 
+// Function to extract public key hash from scriptpubkey_asm
 function extractPkh(scriptpubkey_asm) {
   let parts = scriptpubkey_asm.split(" ");
   let pkhIndex = -1;
@@ -61,9 +66,10 @@ function extractPkh(scriptpubkey_asm) {
   return pkhIndex !== -1 ? parts[pkhIndex] : null;
 }
 
+// Function to validate addresses in a transaction
 export function isValidAddresses(transaction) {
   let isValid = true;
-  //validate input address
+  // Validate input address
   for (let input of transaction.vin) {
     let scriptPubKey = input.prevout.scriptpubkey_asm;
     let pkh = extractPkh(scriptPubKey);
@@ -85,7 +91,7 @@ export function isValidAddresses(transaction) {
     isValid = true;
   }
 
-  //validate output address
+  // Validate output address
   for (let output of transaction.vout) {
     let scriptPubKey = output.scriptpubkey_asm;
     let pkh = extractPkh(scriptPubKey);

@@ -6,6 +6,7 @@ import {
   verifySignature,
 } from "./utils.js";
 
+// Function to verify a legacy transaction
 export default function verifyLegacyTransaction(
   transaction,
   input,
@@ -14,12 +15,15 @@ export default function verifyLegacyTransaction(
 ) {
   const serialized = serializeLegacyTransaction(transaction, input, signatures);
   let validCount = 0;
+  // Loop through each signature
   for (let signature of signatures) {
+    // Loop through each public key
     for (let publicKey of publicKeys) {
       const sighashType = Buffer.alloc(4);
       sighashType.writeUInt32LE(parseInt(signature.slice(-2), 16), 0);
       const serializedWithSighash = Buffer.concat([serialized, sighashType]);
       const hashResult = hash256Buffer(serializedWithSighash);
+      // Verify the signature
       const result = verifySignature(
         hashResult.toString("hex"),
         signature,
@@ -35,10 +39,12 @@ export default function verifyLegacyTransaction(
   return isValid;
 }
 
+// Function to serialize a legacy transaction
 function serializeLegacyTransaction(transaction, input, signatures) {
   const signatureType = signatures[0].slice(-2);
   let sighashType;
   let anyOneCanPayFlag = false;
+  // Determine the sighash type and anyOneCanPay flag
   if (signatureType === "01") {
     sighashType = "ALL";
   } else if (signatureType === "02") {
@@ -71,6 +77,7 @@ function serializeLegacyTransaction(transaction, input, signatures) {
   return Buffer.concat([version, vinLength, inputs, outputs, locktime]);
 }
 
+// Function to serialize inputs
 function serializeInputs(inputs, input, anyOneCanPayFlag) {
   if (anyOneCanPayFlag) {
     inputs = [input];
@@ -86,6 +93,7 @@ function serializeInputs(inputs, input, anyOneCanPayFlag) {
   return serialized;
 }
 
+// Function to serialize outputs
 function serializeOutputs(outputs) {
   let serialized = serializeVarInt(outputs.length).toString("hex");
   outputs.forEach((output) => {
