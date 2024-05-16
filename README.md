@@ -1,3 +1,40 @@
+# Bitcoint Tx Validator - Mine My first block
+
+In this project, I simulated the mining process of a block, which involves validating and including transactions from a given set of transactions. This repository contains a folder named mempool that contains JSON files representing individual transactions, some of which may be invalid. The goal was to mine a block by including only the valid transactions. I wrote a script that processes these transactions, validates them, and mines them into a block. The output of my script is stored in a file named `output.txt`.
+
+## Requirements
+### Input
+- A folder named mempool within this repository containing several JSON files, each representing a transaction with all necessary information for validation.
+- The script must discern valid transactions from invalid ones.
+
+### Output
+The script generates an output file named output.txt with the following structure:
+
+- First line: The block header.
+- Second line: The serialized coinbase transaction.
+- Following lines: The transaction IDs (txids) of the transactions mined in the block, in order. The first txid should be that of the coinbase transaction.
+
+### Difficulty Target
+- The difficulty target is 0000ffff00000000000000000000000000000000000000000000000000000000. This value specifies that the block hash must be less than this target for the block to be successfully mined.
+
+## Execution
+- The script autonomously performs all tasks when run.sh is executed, requiring no manual intervention.
+
+## Some stuff to know :
+
+    a. Block Header - Contains metadata about the block, including the previous block hash, timestamp, and nonce.
+    b. Coinbase Transaction: A special transaction included in each block that awards the miner the block reward.
+    c. Difficulty Target: A value that the block hash must be less than for the block to be considered valid.
+    d. Proof of Work: A computational effort required to mine a block, involving incrementing a nonce until the block hash meets the difficulty target.
+    e. A bitcoin transaction is just a bunch of bytes. And if you decode them, you'll find that they're just unlocking batches of bitcoins and locking them up in to new batches.
+    f. TXID is is created by double-SHA256ing of the following fields in the raw transaction data. TXID = HASH256([version][inputs][outputs][locktime]). The TXIDs of transactions are also hashed together to create a merkle root for the block header. This basically creates a "fingerprint" for the transactions that have been included in the block, so if any of the transaction change, so will the fingerprint.
+    g. A transaction fee is the remainder of a transaction.
+    h. Mempool is  just a pool of unconfirmed transactions.
+    i. A candidate block is a block of transactions a miner attempts to add to the blockchain. During the mining process, each miner will collect transactions from their memory pool in to a candidate block. They will then repeatedly hash this block to try and get a block hash below the target. If a miner can get a block hash below the target, their candidate block can be added on to the blockchain. They will then broadcast this "mined" candidate block to the other nodes on the network, where each node will verify and add it to their blockchain too.
+    j. The block header is a small amount of metadata the summarizes all the data inside the block. This is what a miner will be hashing as they attempt to mine the candidate block.
+    k. The target is a number that a block hash for a candidate block must get below before the block can be added on to the blockchain.
+    l. The nonce is a spare field at the end of the block header used for mining. Miners increment the nonce value when mining so that they can get completely different hash results for the block header of their candidate block. They hope to stumble upon a "magic" nonce value that will produce a block hash that is below the current target. There is no guarantee that there will be a "magic" nonce value for any given block header. In fact, it's likely that there will be no nonce value that will produce a hash result below the target.
+
 ## Design Approch
 
 ### Take all transactions from mempool directory:
