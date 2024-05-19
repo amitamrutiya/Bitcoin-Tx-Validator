@@ -1,9 +1,13 @@
 import { bech32 } from "bech32";
 import bs58 from "bs58";
-import { hash256Buffer } from "./utils.js";
+import { hash256Buffer } from "./utils";
+import { Transaction } from "./types";
 
 // Function to generate address based on transaction type
-function generateAddress(publicKeyHash, transactionType) {
+function generateAddress(
+  publicKeyHash: string,
+  transactionType: string
+): string | undefined {
   if (transactionType === "p2pkh") {
     return generateLegacyAddress(publicKeyHash, 0x00);
   } else if (transactionType === "p2sh") {
@@ -19,12 +23,15 @@ function generateAddress(publicKeyHash, transactionType) {
 }
 
 // Function to generate legacy address (P2PKH and P2SH)
-function generateLegacyAddress(publicKeyHash, versionByte) {
-  const PublicKeyHash = Buffer.from(publicKeyHash, "hex");
+function generateLegacyAddress(
+  publicKeyHash: string,
+  versionByte: number
+): string {
+  const publicKeyHashBuffer = Buffer.from(publicKeyHash, "hex");
   // Prepend version byte to the public key hash
   const extendedPublicKeyHash1 = Buffer.concat([
     Buffer.from([versionByte]),
-    PublicKeyHash,
+    publicKeyHashBuffer,
   ]);
 
   const hash2 = hash256Buffer(extendedPublicKeyHash1);
@@ -34,7 +41,7 @@ function generateLegacyAddress(publicKeyHash, versionByte) {
   // Append checksum to the public key hash
   const extendedPublicKeyHash2 = Buffer.concat([
     Buffer.from([versionByte]),
-    PublicKeyHash,
+    publicKeyHashBuffer,
     checksum,
   ]);
 
@@ -45,16 +52,18 @@ function generateLegacyAddress(publicKeyHash, versionByte) {
 }
 
 // Function to convert public key hash to Bech32 address
-function convertToBech32(PKH, witness) {
-  const witnessVersion = witness; // 5 bits prefix for PKH
-  const words = bech32.toWords(Buffer.from(PKH, "hex"));
+function convertToBech32(
+  publicKeyHash: string,
+  witnessVersion: number
+): string {
+  const words = bech32.toWords(Buffer.from(publicKeyHash, "hex"));
   const address = bech32.encode("bc", [witnessVersion, ...words]);
   return address;
 }
 
 // Function to extract public key hash from scriptpubkey_asm
-function extractPkh(scriptpubkey_asm) {
-  let parts = scriptpubkey_asm.split(" ");
+function extractPkh(scriptpubkey_asm: string): string | null {
+  const parts = scriptpubkey_asm.split(" ");
   let pkhIndex = -1;
 
   if (parts.includes("OP_PUSHBYTES_20")) {
@@ -67,18 +76,19 @@ function extractPkh(scriptpubkey_asm) {
 }
 
 // Function to validate addresses in a transaction
-export function isValidAddresses(transaction) {
+export function isValidAddresses(transaction: Transaction): boolean {
   let isValid = true;
+
   // Validate input address
-  for (let input of transaction.vin) {
-    let scriptPubKey = input.prevout.scriptpubkey_asm;
-    let pkh = extractPkh(scriptPubKey);
-    let type = input.prevout.scriptpubkey_type;
-    let address = generateAddress(pkh, type);
+  for (const input of transaction.vin) {
+    const scriptPubKey = input.prevout.scriptpubkey_asm;
+    const pkh = extractPkh(scriptPubKey);
+    const type = input.prevout.scriptpubkey_type;
+    const address = pkh ? generateAddress(pkh, type) : null;
     if (type === "v1_p2tr" || type === "unknown") {
       continue;
     }
-    if (address !== input.prevout.scriptpubkey_address) {
+    if (address && address !== input.prevout.scriptpubkey_address) {
       console.log(
         "Input Address does not match " +
           address +
@@ -92,15 +102,15 @@ export function isValidAddresses(transaction) {
   }
 
   // Validate output address
-  for (let output of transaction.vout) {
-    let scriptPubKey = output.scriptpubkey_asm;
-    let pkh = extractPkh(scriptPubKey);
-    let type = output.scriptpubkey_type;
+  for (const output of transaction.vout) {
+    const scriptPubKey = output.scriptpubkey_asm;
+    const pkh = extractPkh(scriptPubKey);
+    const type = output.scriptpubkey_type;
     if (type === "op_return" || type === "unknown" || type === "v1_p2tr") {
       continue;
     }
-    let address = generateAddress(pkh, type);
-    if (address !== output.scriptpubkey_address) {
+    const address = pkh ? generateAddress(pkh, type) : null;
+    if (address && address !== output.scriptpubkey_address) {
       console.log(
         "Output Address does not match " +
           address +

@@ -4,8 +4,8 @@
   "description": "validate any type of bitcoin address",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "npx tsc && node dist/index.js",
+    "dev": "nodemon --exec ts-node index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -16,5 +16,11 @@
     "bs58": "^5.0.0",
     "elliptic": "^6.5.5"
   },
-  "type": "module"
+  "devDependencies": {
+    "@types/elliptic": "^6.4.18",
+    "@types/node": "^20.12.12",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
 }

@@ -1,5 +1,7 @@
-export function selectTransaction(transactions) {
-  let finalTransactions = [];
+import { Transaction } from "./types";
+
+export function selectTransaction(transactions: Transaction[]): Transaction[] {
+  let finalTransactions: Transaction[] = [];
   const maxFee = 20616923;
   const maxWeight = 3990000;
   let fee = 0;
@@ -26,7 +28,8 @@ export function selectTransaction(transactions) {
   for (let transaction of transactions) {
     if (
       !finalTransactions.includes(transaction) &&
-      fee + transaction.fee <= maxFee
+      fee + transaction.fee <= maxFee &&
+      weight + transaction.weight <= maxWeight // Check if adding this transaction would exceed the maxWeight
     ) {
       finalTransactions.push(transaction);
       fee += transaction.fee;
@@ -34,5 +37,7 @@ export function selectTransaction(transactions) {
     }
   }
 
+  console.log("fee: ", fee);
+  console.log("weight: ", weight);
   return finalTransactions;
 }

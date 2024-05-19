@@ -1,7 +1,9 @@
-import { toLittleEndian, serializeVarInt } from "./utils.js";
+import {  Transaction } from "./types";
+import { toLittleEndian, serializeVarInt } from "./utils";
+
 
 // Function to serialize a witness transaction
-export function serializeWitnessTransaction(tx) {
+export function serializeWitnessTransaction(tx: Transaction ): string {
   // Convert version to little endian format
   let version = toLittleEndian(tx.version.toString(16).padStart(8, "0"));
 
@@ -64,14 +66,17 @@ export function serializeWitnessTransaction(tx) {
         if (input.witness === undefined) {
           return "00";
         }
-        let witness = input.witness
-          .map((witness) => {
+        let witnessData = input.witness
+          .map((witnessItem) => {
             return (
-              serializeVarInt(witness.length / 2).toString("hex") + witness
+              serializeVarInt(witnessItem.length / 2).toString("hex") +
+              witnessItem
             );
           })
           .join("");
-        return serializeVarInt(input.witness.length).toString("hex") + witness;
+        return (
+          serializeVarInt(input.witness.length).toString("hex") + witnessData
+        );
       })
       .join("");
   }
@@ -88,7 +93,7 @@ export function serializeWitnessTransaction(tx) {
     4 * serializedTransaction.length + serializedWitnessTransaction.length;
 
   // Add the weight to the transaction
-  tx["weight"] = weight / 2;
+  tx.weight = weight / 2;
 
   // Return the serialized transaction
   return (

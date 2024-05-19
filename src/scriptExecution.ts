@@ -1,13 +1,14 @@
-import { hash160, sha256 } from "./utils.js";
-import { isValidSignature } from "./verifySignature.js";
+import { Transaction } from "./types";
+import { hash160, sha256 } from "./utils";
+import { isValidSignature } from "./verifySignature";
 
 // Function to execute a script for a transaction
-export function executeScript(transaction) {
+export function executeScript(transaction: Transaction): boolean {
   let allValid = true;
   for (let input of transaction.vin) {
-    let stack = [];
+    let stack: (string | boolean)[] = [];
     let script = "";
-    let scriptTokens = [];
+    let scriptTokens: string[] = [];
 
     // Handle different types of scripts
     if (input.prevout.scriptpubkey_type === "p2pkh") {
@@ -17,7 +18,7 @@ export function executeScript(transaction) {
     } else if (
       input.prevout.scriptpubkey_type === "p2sh" &&
       input.witness === undefined &&
-      !input.inner_redeemscript_asm.split(" ").includes("OP_CSV")
+      !input.inner_redeemscript_asm?.split(" ").includes("OP_CSV")
     ) {
       // Pay-to-Script-Hash (P2SH)
       const scriptsig_asm = input.scriptsig_asm.split(" ");
@@ -30,11 +31,11 @@ export function executeScript(transaction) {
 
       script = [
         ...scriptSig,
-        ...input.inner_redeemscript_asm.split(" "),
+        ...(input.inner_redeemscript_asm?.split(" ") ?? []),
         ...inner_redeemscript,
         ...input.prevout.scriptpubkey_asm.split(" "),
-      ];
-      scriptTokens = script;
+      ].join(" ");
+      scriptTokens = script.split(" ");
     } else if (
       input.prevout.scriptpubkey_type === "p2sh" &&
       input.witness !== undefined &&
@@ -56,15 +57,15 @@ export function executeScript(transaction) {
       input.prevout.scriptpubkey_type === "p2sh" &&
       input.witness !== undefined &&
       input.witness.length > 2 &&
-      !input.inner_witnessscript_asm.split(" ").includes("OP_CSV") &&
-      !input.inner_witnessscript_asm.split(" ").includes("OP_DROP")
+      !input.inner_witnessscript_asm?.split(" ").includes("OP_CSV") &&
+      !input.inner_witnessscript_asm?.split(" ").includes("OP_DROP")
     ) {
       // P2SH with multiple witness data
       const signatures = input.witness.slice(1, -1);
       const scriptsig = input.scriptsig_asm.split(" ")[1];
       stack.push(...signatures);
       script =
-        input.inner_witnessscript_asm +
+        (input.inner_witnessscript_asm ?? "") +
         " " +
         scriptsig +
         " " +
@@ -80,7 +81,7 @@ export function executeScript(transaction) {
       const scriptsig = input.witness[input.witness.length - 1];
       stack.push(...signatures);
       script =
-        input.inner_witnessscript_asm +
+        (input.inner_witnessscript_asm ?? "") +
         " " +
         scriptsig +
         " OP_SHA256 " +
@@ -90,8 +91,8 @@ export function executeScript(transaction) {
     } else if (input.prevout.scriptpubkey_type === "v0_p2wpkh") {
       // Pay-to-Witness-Public-Key-Hash (P2WPKH)
       const pkh = input.prevout.scriptpubkey_asm.split(" ")[2];
-      stack.push(input.witness[0]);
-      stack.push(input.witness[1]);
+      stack.push(input.witness![0]);
+      stack.push(input.witness![1]);
 
       script = "OP_DUP OP_HASH160 " + pkh + " OP_EQUALVERIFY OP_CHECKSIG";
 
@@ -99,14 +100,14 @@ export function executeScript(transaction) {
     } else {
       return false;
     }
-    
+
     // Execute the script
     while (scriptTokens.length > 0) {
       const token = scriptTokens.shift();
       if (token === "OP_CHECKSIG") {
         // Check signature
-        const publicKey = stack.pop();
-        const signature = stack.pop();
+        const publicKey = stack.pop() as string;
+        const signature = stack.pop() as string;
         const isValid = isValidSignature(
           transaction,
           input,
@@ -136,16 +137,20 @@ export function executeScript(transaction) {
         stack.push(topItem);
       } else if (token === "OP_HASH160") {
         // Apply the SHA-256 hash followed by the RIPEMD-160 hash to the top item on the stack
-        const data = stack.pop();
+        const data = stack.pop() as string;
         const hashedData = hash160(data);
         stack.push(hashedData);
       } else if (token === "OP_PUSHDATA1") {
         const bytes = scriptTokens.shift();
+        if (bytes === undefined) {
+          console.log("No bytes found");
+          return false;
+        }
         stack.push(bytes);
-      } else if (token.startsWith("OP_PUSHBYTES_")) {
+      } else if (token?.startsWith("OP_PUSHBYTES_")) {
         // Push data onto the stack
         const bytesLength = parseInt(token.substring("OP_PUSHBYTES_".length));
-        const bytes = scriptTokens.shift();
+        const bytes = scriptTokens.shift() as string;
 
         // Check that the length of bytes matches bytesLength
         if (bytes.length / 2 !== bytesLength) {
@@ -155,16 +160,20 @@ export function executeScript(transaction) {
         stack.push(bytes);
       } else if (token === "OP_0") {
       } else if (token === "OP_CHECKMULTISIG") {
-        const n = parseInt(stack.pop().substring("OP_PUSHNUM_".length));
-        const publicKeys = [];
+        const n = parseInt(
+          (stack.pop() as string).substring("OP_PUSHNUM_".length)
+        );
+        const publicKeys: string[] = [];
         for (let i = 0; i < n; i++) {
-          publicKeys.push(stack.pop());
+          publicKeys.push(stack.pop() as string);
         }
-        const m = parseInt(stack.pop().substring("OP_PUSHNUM_".length));
+        const m = parseInt(
+          (stack.pop() as string).substring("OP_PUSHNUM_".length)
+        );
 
-        const signatures = [];
+        const signatures: string[] = [];
         for (let i = 0; i < m; i++) {
-          signatures.push(stack.pop());
+          signatures.push(stack.pop() as string);
         }
         const isValid = isValidSignature(
           transaction,
@@ -174,19 +183,21 @@ export function executeScript(transaction) {
         );
         stack.push(isValid);
       } else if (token === "OP_SHA256") {
-        const data = stack.pop();
+        const data = stack.pop() as string;
         const hashedData = sha256(data);
         stack.push(hashedData);
       } else if (token === "OP_DROP") {
         stack.pop();
       } else if (token === "OP_CSV") {
-        const n = parseInt(stack.pop().substring("OP_PUSHNUM_".length));
+        const n = parseInt(
+          (stack.pop() as string).substring("OP_PUSHNUM_".length)
+        );
         if (n < 0) {
           return false;
         }
       } else if (token === "OP_SWAP") {
-        const top = stack.pop();
-        const second = stack.pop();
+        const top = stack.pop() as string;
+        const second = stack.pop() as string;
         stack.push(top);
         stack.push(second);
       } else if (token === "OP_IF") {
@@ -197,7 +208,7 @@ export function executeScript(transaction) {
       } else if (token === "OP_ELSE") {
       } else if (token === "OP_ENDIF") {
       } else {
-        stack.push(token);
+        stack.push(token ?? "");
       }
     }
 
