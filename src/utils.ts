@@ -1,7 +1,7 @@
-import crypto from 'crypto';
-import pkg from 'elliptic';
+import crypto from "crypto";
+import pkg from "elliptic";
 const { ec: EC } = pkg;
-const ec = new EC('secp256k1');
+const ec = new EC("secp256k1");
 
 export function serializeUInt32LE(value: number): Buffer {
   const buffer = Buffer.alloc(4);
@@ -10,15 +10,15 @@ export function serializeUInt32LE(value: number): Buffer {
 }
 
 export function hash256Buffer(buffer: Buffer): Buffer {
-  const hash1 = crypto.createHash('sha256').update(buffer).digest();
-  const hash2 = crypto.createHash('sha256').update(hash1).digest();
+  const hash1 = crypto.createHash("sha256").update(buffer).digest();
+  const hash2 = crypto.createHash("sha256").update(hash1).digest();
   return hash2;
 }
 
 export function hash256(data: string): string {
-  const binary = Buffer.from(data, 'hex');
-  const hash1 = crypto.createHash('sha256').update(binary).digest();
-  const hash2 = crypto.createHash('sha256').update(hash1).digest('hex');
+  const binary = Buffer.from(data, "hex");
+  const hash1 = crypto.createHash("sha256").update(binary).digest();
+  const hash2 = crypto.createHash("sha256").update(hash1).digest("hex");
   return hash2;
 }
 
@@ -26,11 +26,11 @@ export function serializeVarInt(value: number): string | Buffer {
   if (value < 0xfd) {
     return serializeUInt8LE(value);
   } else if (value <= 0xffff) {
-    return 'fd' + serializeUInt16LE(value).toString('hex');
+    return "fd" + serializeUInt16LE(value).toString("hex");
   } else if (value <= 0xffffffff) {
-    return 'fe' + serializeUInt32LE(value).toString('hex');
+    return "fe" + serializeUInt32LE(value).toString("hex");
   } else {
-    return 'ff' + serializeUInt64LE(value).toString('hex');
+    return "ff" + serializeUInt64LE(value).toString("hex");
   }
 }
 
@@ -58,13 +58,16 @@ export function verifySignature(
   publicKeyHex: string
 ): boolean {
   try {
-    const signature = Buffer.from(signatureHex.slice(0, -2), 'hex');
-    const message = Buffer.from(transactionDigestHex, 'hex');
-    const publicKey = ec.keyFromPublic(publicKeyHex, 'hex');
+    const signature = Buffer.from(signatureHex.slice(0, -2), "hex");
+    const message = Buffer.from(transactionDigestHex, "hex");
+    const publicKey = ec.keyFromPublic(publicKeyHex, "hex");
     const result = publicKey.verify(message, signature);
+    if (!result) {
+      return false;
+    }
     return result;
   } catch (error) {
-    console.log('Error in verifySignature ', signatureHex, publicKeyHex);
+    console.log("Error in verifySignature ", signatureHex, publicKeyHex);
     console.log(error);
     return false;
   }
@@ -84,8 +87,8 @@ function hexStringToBuffer(hexString: string): Uint8Array {
 
 function bufferToHex(buffer: Uint8Array): string {
   return Array.from(buffer)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 function hexToBytes(hex: string): Uint8Array {
@@ -98,13 +101,13 @@ function hexToBytes(hex: string): Uint8Array {
 
 function bytesToHex(byteArray: Uint8Array): string {
   return Array.from(byteArray, (byte) =>
-    ('0' + (byte & 0xff).toString(16)).slice(-2)
-  ).join('');
+    ("0" + (byte & 0xff).toString(16)).slice(-2)
+  ).join("");
 }
 
 export function sha256(inputHex: string): string {
   const hashBuffer = crypto
-    .createHash('sha256')
+    .createHash("sha256")
     .update(hexStringToBuffer(inputHex))
     .digest();
   return bufferToHex(new Uint8Array(hashBuffer));
@@ -112,19 +115,19 @@ export function sha256(inputHex: string): string {
 
 function ripemd(inputHex: string): string {
   const hash = crypto
-    .createHash('ripemd160')
-    .update(Buffer.from(inputHex, 'hex'))
+    .createHash("ripemd160")
+    .update(Buffer.from(inputHex, "hex"))
     .digest();
-  return hash.toString('hex');
+  return hash.toString("hex");
 }
 
 export function calculateTxId(serializedTransaction: string): Buffer {
   const hashResult = crypto
-    .createHash('sha256')
-    .update(Buffer.from(serializedTransaction, 'hex'))
+    .createHash("sha256")
+    .update(Buffer.from(serializedTransaction, "hex"))
     .digest();
   const doubleHashResult = crypto
-    .createHash('sha256')
+    .createHash("sha256")
     .update(hashResult)
     .digest();
 
@@ -134,8 +137,9 @@ export function calculateTxId(serializedTransaction: string): Buffer {
 export function createMerkleRoot(txids: string[]): string | null {
   if (txids.length === 0) return null;
 
+  // reverse the txids
   let level = txids.map((txid) =>
-    Buffer.from(txid, 'hex').reverse().toString('hex')
+    Buffer.from(txid, "hex").reverse().toString("hex")
   );
 
   while (level.length > 1) {
@@ -143,6 +147,7 @@ export function createMerkleRoot(txids: string[]): string | null {
 
     for (let i = 0; i < level.length; i += 2) {
       let pairHash;
+      // In case of an odd number of elements, duplicate the last one
       if (i + 1 === level.length) {
         pairHash = hash256(level[i] + level[i]);
       } else {
@@ -157,6 +162,7 @@ export function createMerkleRoot(txids: string[]): string | null {
   return level[0];
 }
 
+// Reverse the order of bytes (often happens when working with raw bitcoin data)
 export function toLittleEndian(hex: string): string {
-  return Buffer.from(hex, 'hex').reverse().toString('hex');
+  return Buffer.from(hex, "hex").reverse().toString("hex");
 }
