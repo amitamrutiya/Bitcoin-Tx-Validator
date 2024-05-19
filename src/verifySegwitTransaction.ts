@@ -1,29 +1,26 @@
+import { Transaction, TransactionInput } from "./types";
 import {
   hash256Buffer,
   serializeUInt32LE,
   serializeUInt64LE,
   verifySignature,
   serializeVarInt,
-} from "./utils.js";
+} from "./utils";
 
-// Function to verify a SegWit transaction
 export default function verifySegwitTransaction(
-  transaction,
-  input,
-  signatures,
-  publicKeys
-) {
+  transaction: Transaction,
+  input: TransactionInput,
+  signatures: string[],
+  publicKeys: string[]
+): boolean {
   const serialized = serializeSegwitTransaction(transaction, input);
   let validCount = 0;
-  // Loop through each signature
-  for (let signature of signatures) {
-    // Loop through each public key
-    for (let publicKey of publicKeys) {
+  for (const signature of signatures) {
+    for (const publicKey of publicKeys) {
       const sighashType = Buffer.alloc(4);
       sighashType.writeUInt32LE(parseInt(signature.slice(-2), 16), 0);
       const serializedWithSighash = Buffer.concat([serialized, sighashType]);
       const hashResult = hash256Buffer(serializedWithSighash);
-      // Verify the signature
       const result = verifySignature(
         hashResult.toString("hex"),
         signature,
@@ -39,15 +36,16 @@ export default function verifySegwitTransaction(
   return isValid;
 }
 
-// Function to serialize a SegWit transaction
-function serializeSegwitTransaction(transaction, input) {
+function serializeSegwitTransaction(
+  transaction: Transaction,
+  input: TransactionInput
+): Buffer {
   const inputIndex = transaction.vin.findIndex(
     (vin) => vin.txid === input.txid
   );
-  const signatureType = input.witness[0].slice(-2);
+  const signatureType = input.witness![0].slice(-2);
   let sighashType;
   let anyOneCanPayFlag = false;
-  // Determine the sighash type and anyOneCanPay flag
   if (signatureType === "01") {
     sighashType = "ALL";
   } else if (signatureType === "02") {
@@ -64,7 +62,6 @@ function serializeSegwitTransaction(transaction, input) {
     sighashType = "SINGLE";
     anyOneCanPayFlag = true;
   }
-  // Serialize the transaction
   const version = serializeUInt32LE(transaction.version);
   const hashPrevout = hashPrevouts(transaction, anyOneCanPayFlag);
   const hashSequences = hashSequence(transaction, input, anyOneCanPayFlag);
@@ -74,7 +71,7 @@ function serializeSegwitTransaction(transaction, input) {
   const nSequence = serializeUInt32LE(input.sequence);
   const hashOutput = hashOutputs(
     transaction,
-    sighashType,
+    sighashType!,
     inputIndex,
     anyOneCanPayFlag
   );
@@ -92,16 +89,13 @@ function serializeSegwitTransaction(transaction, input) {
   ]);
 }
 
-// Function to serialize the outpoint
-function serializeOutpoint(input) {
+function serializeOutpoint(input: TransactionInput): Buffer {
   const txid = Buffer.from(input.txid, "hex").reverse();
   const vout = serializeUInt32LE(input.vout);
   return Buffer.concat([txid, vout]);
 }
 
-// Function to serialize the script code
-function serializeScriptCode(input) {
-  // Check for P2SH and witness conditions
+function serializeScriptCode(input: TransactionInput): Buffer {
   if (
     input.prevout.scriptpubkey_type === "p2sh" &&
     input.witness !== undefined &&
@@ -110,7 +104,7 @@ function serializeScriptCode(input) {
   ) {
     const scriptPubKey = input.witness[input.witness.length - 1];
     return Buffer.concat([
-      serializeVarInt(scriptPubKey.length / 2),
+      Buffer.from(serializeVarInt(scriptPubKey.length / 2).toString(), "hex"),
       Buffer.from(scriptPubKey, "hex"),
     ]);
   }
@@ -122,19 +116,23 @@ function serializeScriptCode(input) {
   ]);
 }
 
-// Function to hash the previous outputs
-function hashPrevouts(transaction, anyOneCanPayFlag) {
+function hashPrevouts(transaction: any, anyOneCanPayFlag: boolean): Buffer {
   if (transaction.vin[0].is_coinbase || anyOneCanPayFlag) {
     return Buffer.alloc(32);
   } else {
-    const outpoints = transaction.vin.map((input) => serializeOutpoint(input));
+    const outpoints = transaction.vin.map((input: any) =>
+      serializeOutpoint(input)
+    );
     const buffer = Buffer.concat(outpoints);
     return hash256Buffer(buffer);
   }
 }
 
-// Function to hash the sequence
-function hashSequence(transaction, input, anyOneCanPayFlag) {
+function hashSequence(
+  transaction: Transaction,
+  input: TransactionInput,
+  anyOneCanPayFlag: boolean
+): Buffer {
   if (anyOneCanPayFlag) {
     return Buffer.alloc(32);
   }
@@ -145,10 +143,13 @@ function hashSequence(transaction, input, anyOneCanPayFlag) {
   return hash256Buffer(buffer);
 }
 
-// Function to hash the outputs
-function hashOutputs(transaction, sighashType, inputIndex, anyOneCanPayFlag) {
+function hashOutputs(
+  transaction: Transaction,
+  sighashType: string,
+  inputIndex: number,
+  anyOneCanPayFlag: boolean
+): Buffer {
   let outputs;
-  // Determine the outputs based on the sighash type
   if (sighashType === "SINGLE" && inputIndex < transaction.vout.length) {
     const output = transaction.vout[inputIndex];
     const value = serializeUInt64LE(output.value);
