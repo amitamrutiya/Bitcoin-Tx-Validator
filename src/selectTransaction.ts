@@ -1,5 +1,7 @@
-export function selectTransaction(transactions) {
-  let finalTransactions = [];
+import { Transaction } from "./types";
+
+export function selectTransaction(transactions: Transaction[]): Transaction[] {
+  let finalTransactions: Transaction[] = [];
   const maxFee = 20616923;
   const maxWeight = 3990000;
   let fee = 0;
