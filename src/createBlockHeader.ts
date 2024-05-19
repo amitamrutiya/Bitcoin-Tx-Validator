@@ -1,7 +1,7 @@
-import { createMerkleRoot, toLittleEndian, hash256 } from "./utils.js";
+import { createMerkleRoot, toLittleEndian, hash256 } from "./utils";
 
 // Converts the target difficulty into bits for the block header
-function targetToBits(target) {
+function targetToBits(target: string): string {
   let targetBigInt = BigInt("0x" + target);
   let exponent = 0;
   while (targetBigInt > 0n) {
@@ -20,20 +20,25 @@ function targetToBits(target) {
 }
 
 // Returns the current Unix timestamp
-function dateStringToUnixTime() {
-  var date = new Date();
+function dateStringToUnixTime(): number {
+  const date = new Date();
   return Math.floor(date.getTime() / 1000);
 }
 
 // Convert a number to fit inside a field that is a specific number of bytes e.g. field(1, 4) = 00000001
-function field(data, size) {
+function field(data: number, size: number): string {
   return BigInt(data)
     .toString(16)
     .padStart(size * 2, "0");
 }
 
+// Type definition for transaction
+interface Transaction {
+  TxId: string;
+}
+
 // Creates a new block header for a set of transactions
-export function createBlockHeader(transactions) {
+export function createBlockHeader(transactions: Transaction[]): string {
   // Define the target difficulty for the block
   const target =
     "0000ffff00000000000000000000000000000000000000000000000000000000";
@@ -55,7 +60,7 @@ export function createBlockHeader(transactions) {
 
   // Create the block header
   let header =
-    toLittleEndian(field(version, 4)) +
+    toLittleEndian(field(parseInt(version), 4)) +
     toLittleEndian(prevblock) +
     merkleroot +
     toLittleEndian(field(time, 4)) +
