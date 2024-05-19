@@ -1,13 +1,14 @@
-import verifyLegacyTransaction from "./verifyLegacyTransaction.js";
-import verifySegwitTransaction from "./verifySegwitTransaction.js";
+import { Transaction, TransactionInput } from "./types";
+import verifyLegacyTransaction from "./verifyLegacyTransaction";
+import verifySegwitTransaction from "./verifySegwitTransaction";
 
 // Function to check if a signature is valid
 export function isValidSignature(
-  transaction,
-  outerInput,
-  signatures,
-  publicKeys
-) {
+  transaction: Transaction,
+  outerInput: TransactionInput,
+  signatures: string[],
+  publicKeys: string[]
+): boolean {
   // Check if the transaction is SegWit
   const isSegwit = outerInput.witness !== undefined;
   if (isSegwit) {
@@ -17,8 +18,8 @@ export function isValidSignature(
     }
     // Determine the scriptsig based on the scriptpubkey type
     if (outerInput.prevout.scriptpubkey_type === "p2sh") {
-      const scriptsig_asm = outerInput.scriptsig_asm.split(" ");
-      outerInput.scriptsig = scriptsig_asm[scriptsig_asm.length - 1];
+      const scriptsig_asm = outerInput.scriptsig_asm?.split(" ") ?? [];
+      outerInput.scriptsig = scriptsig_asm[scriptsig_asm.length - 1] ?? "";
     } else if (outerInput.prevout.scriptpubkey_type === "v0_p2wpkh") {
       outerInput.scriptsig = outerInput.prevout.scriptpubkey;
     } else {
@@ -31,10 +32,7 @@ export function isValidSignature(
       signatures,
       publicKeys
     );
-    if (!isValid) {
-      return false;
-    }
-    return true;
+    return isValid;
   } else {
     // Clear the scriptsig for all inputs
     for (let input of transaction.vin) {
@@ -42,8 +40,8 @@ export function isValidSignature(
     }
     // Determine the scriptsig based on the scriptpubkey type
     if (outerInput.prevout.scriptpubkey_type === "p2sh") {
-      const scriptsig_asm = outerInput.scriptsig_asm.split(" ");
-      outerInput.scriptsig = scriptsig_asm[scriptsig_asm.length - 1];
+      const scriptsig_asm = outerInput.scriptsig_asm?.split(" ") ?? [];
+      outerInput.scriptsig = scriptsig_asm[scriptsig_asm.length - 1] ?? "";
     } else if (outerInput.prevout.scriptpubkey_type === "p2pkh") {
       outerInput.scriptsig = outerInput.prevout.scriptpubkey;
     } else {
@@ -56,9 +54,6 @@ export function isValidSignature(
       signatures,
       publicKeys
     );
-    if (!isValid) {
-      return false;
-    }
-    return true;
+    return isValid;
   }
 }
