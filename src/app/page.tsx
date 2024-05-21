@@ -1,3 +1,8 @@
+"use client";
+
+import { isTransactionValid } from "@/actions/isTransactionValid";
+import isValidTransaction from "@/service/isValidTransaction";
+import { Transaction } from "@/types";
 import { FormEvent, useState } from "react";
 
 export default function App() {
@@ -48,9 +53,11 @@ export default function App() {
   const [validateTransaction, setValidateTransaction] = useState(true);
   const [transaction, setTransaction] = useState<Transaction>(dummyTransaction);
 
-  function handleFormSubmit(event: FormEvent<HTMLFormElement>): void {
+  async function handleFormSubmit(
+    event: FormEvent<HTMLFormElement>
+  ): Promise<void> {
     event.preventDefault();
-    const isValid = isValidTransaction(transaction);
+    const isValid = await isTransactionValid(transaction);
     console.log(isValid);
   }
 

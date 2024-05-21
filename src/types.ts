@@ -45,8 +45,8 @@ export interface Transaction {
   locktime: number;
   vin: TransactionInput[];
   vout: TransactionOutput[];
-  fee: number;
-  weight: number;
-  TxId: string;
-  wTxId: string;
+  fee?: number;
+  weight?: number;
+  TxId?: string;
+  wTxId?: string;
 }
