@@ -1,7 +1,6 @@
 "use client";
 
 import { isTransactionValid } from "@/actions/isTransactionValid";
-import isValidTransaction from "@/service/isValidTransaction";
 import { Transaction } from "@/types";
 import { FormEvent, useState } from "react";
 
@@ -61,6 +60,13 @@ export default function App() {
     console.log(isValid);
   }
 
+  async function getRandomTransaction(): Promise<void> {
+    const response = await fetch("/api/randomTransaction");
+    const data = await response.json();
+    console.log(data);
+    setTransaction(data);
+  }
+
   return (
     <div className="min-h-screen w-full flex justify-center items-center bg-secondary-foreground">
       <div className="flex flex-col gap-10 border p-20">
@@ -95,19 +101,17 @@ export default function App() {
             Mine Your Bitcoin Transactions
           </h1>
         )}
-        <form onSubmit={handleFormSubmit}>
-          <label
-            htmlFor="transaction"
-            className="text-2xl font-medium text-primary mb-4 flex justify-between"
+        <div className="text-2xl font-medium text-primary mb-4 flex justify-between">
+          Enter your Bitcoin transaction
+          <button
+            type="submit"
+            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-secondary bg-primary transform transition duration-300 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            onClick={getRandomTransaction}
           >
-            Enter your Bitcoin transaction
-            <button
-              type="submit"
-              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-secondary bg-primary transform transition duration-300 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Random Example
-            </button>
-          </label>
+            Random Example
+          </button>
+        </div>
+        <form onSubmit={handleFormSubmit}>
           <div className="mt-1">
             <textarea
               id="transaction"
