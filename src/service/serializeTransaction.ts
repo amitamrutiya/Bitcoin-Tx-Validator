@@ -1,6 +1,5 @@
-import {  Transaction } from "./types";
+import { Transaction } from "../types";
 import { toLittleEndian, serializeVarInt } from "./utils";
-
 
 // Function to serialize a transaction
 export function serializeTransaction(tx: Transaction): string {

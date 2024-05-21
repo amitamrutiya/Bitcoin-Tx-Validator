@@ -1,4 +1,4 @@
-import { Transaction, TransactionInput } from "./types";
+import { Transaction, TransactionInput } from "../types";
 import {
   hash256Buffer,
   serializeUInt32LE,

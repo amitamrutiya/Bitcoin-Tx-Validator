@@ -1,4 +1,4 @@
-import { Transaction } from "./types";
+import { Transaction } from "../types";
 import { createMerkleRoot, hash256 } from "./utils";
 
 interface WTxid {

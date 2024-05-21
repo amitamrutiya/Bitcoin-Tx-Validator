@@ -1,4 +1,4 @@
-import { Transaction } from "./types";
+import { Transaction } from "../types";
 
 export function selectTransaction(transactions: Transaction[]): Transaction[] {
   let finalTransactions: Transaction[] = [];

@@ -1,10 +1,10 @@
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-import { createBlockHeader } from "./src/createBlockHeader";
-import { createCoinbaseTransaction } from "./src/createCoinbaseTransaction";
-import { executeScript } from "./src/scriptExecution";
-import { selectTransaction } from "./src/selectTransaction";
+import { createBlockHeader } from "./service/createBlockHeader";
+import { createCoinbaseTransaction } from "./service/createCoinbaseTransaction";
+import { executeScript } from "./service/scriptExecution";
+import { selectTransaction } from "./service/selectTransaction";
 import { serializeTransaction } from "./src/serializeTransaction";
 import { serializeWitnessTransaction } from "./src/serializeWitnessTransaction";
 import { Block, Transaction } from "./src/types";

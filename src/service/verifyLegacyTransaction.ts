@@ -1,4 +1,4 @@
-import { Transaction, TransactionInput, TransactionOutput } from "./types";
+import { Transaction, TransactionInput, TransactionOutput } from "../types";
 import {
   serializeUInt32LE,
   serializeUInt64LE,
