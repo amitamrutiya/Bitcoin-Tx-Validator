@@ -1,10 +1,15 @@
 import { Transaction } from "../types";
 
-export function selectTransaction(transactions: Transaction[]): Transaction[] {
-  let finalTransactions: Transaction[] = [];
-  const maxFee = 20616923;
-  const maxWeight = 3990000;
-  let fee = 0;
+type MyType = {
+  selectedTransaction: Transaction[];
+  totalFee: number;
+};
+
+export function selectTransaction(transactions: Transaction[]): MyType {
+  let selectedTransaction: Transaction[] = [];
+  const maxFee = 25000000;
+  const maxWeight = 4000000;
+  let totalFee = 0;
   let weight = 0;
 
   // First pass: select transactions based on the highest fee-to-weight ratio
@@ -16,8 +21,8 @@ export function selectTransaction(transactions: Transaction[]): Transaction[] {
 
   for (let transaction of transactions) {
     if (weight + transaction.weight! <= maxWeight) {
-      finalTransactions.push(transaction);
-      fee += transaction.fee!;
+      selectedTransaction.push(transaction);
+      totalFee += transaction.fee!;
       weight += transaction.weight!;
     }
   }
@@ -27,17 +32,17 @@ export function selectTransaction(transactions: Transaction[]): Transaction[] {
 
   for (let transaction of transactions) {
     if (
-      !finalTransactions.includes(transaction) &&
-      fee + transaction.fee! <= maxFee &&
+      !selectedTransaction.includes(transaction) &&
+      totalFee + transaction.fee! <= maxFee &&
       weight + transaction.weight! <= maxWeight // Check if adding this transaction would exceed the maxWeight
     ) {
-      finalTransactions.push(transaction);
-      fee += transaction.fee!;
+      selectedTransaction.push(transaction);
+      totalFee += transaction.fee!;
       weight += transaction.weight!;
     }
   }
 
-  console.log("fee: ", fee);
+  console.log("fee: ", totalFee);
   console.log("weight: ", weight);
-  return finalTransactions;
+  return { selectedTransaction, totalFee };
 }

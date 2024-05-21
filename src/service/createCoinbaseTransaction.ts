@@ -1,20 +1,16 @@
 import { Transaction } from "../types";
 import { createMerkleRoot, hash256 } from "./utils";
 
-interface WTxid {
-  wTxId: string;
-}
-
 // Function to create a coinbase transaction
 export function createCoinbaseTransaction(
   amount: number,
-  transactions: WTxid[]
+  transactions: Transaction[]
 ): Transaction {
   // Create a 32-byte buffer and convert it to a hexadecimal string
   const witnessReservedValue = Buffer.alloc(32).toString("hex");
 
   // Map over the transactions and get the witness transaction ID (wTxId) of each
-  let wtxids = transactions.map((tx) => tx.wTxId);
+  let wtxids = transactions.map((tx) => tx.wTxId!);
 
   // Add the witness reserved value to the start of the wtxids array
   wtxids.unshift(witnessReservedValue);

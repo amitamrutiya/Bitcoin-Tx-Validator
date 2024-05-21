@@ -1,3 +1,4 @@
+import { Transaction } from "@/types";
 import { createMerkleRoot, toLittleEndian, hash256 } from "./utils";
 
 // Converts the target difficulty into bits for the block header
@@ -32,11 +33,6 @@ function field(data: number, size: number): string {
     .padStart(size * 2, "0");
 }
 
-// Type definition for transaction
-interface Transaction {
-  TxId: string;
-}
-
 // Creates a new block header for a set of transactions
 export function createBlockHeader(transactions: Transaction[]): string {
   // Define the target difficulty for the block
@@ -54,7 +50,7 @@ export function createBlockHeader(transactions: Transaction[]): string {
   // Initialize the nonce
   let nonce = 0;
   // Get all transaction IDs
-  const allTxids = transactions.map((tx) => tx.TxId);
+  const allTxids = transactions.map((tx) => tx.TxId!);
   // Create the Merkle root of the transactions
   const merkleroot = createMerkleRoot(allTxids);
 

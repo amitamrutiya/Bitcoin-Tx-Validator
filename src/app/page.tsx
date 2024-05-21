@@ -3,10 +3,7 @@
 import { isTransactionValid } from "@/actions/isTransactionValid";
 import { mineTransaction } from "@/actions/mineTransaction";
 import { Transaction } from "@/types";
-import path from "path";
-import { FormEvent, useEffect, useState } from "react";
-import fs from "fs";
-// import { getAllTransaction } from "@/actions/getAllTransaction";
+import { FormEvent, useState } from "react";
 
 export default function App() {
   const dummyTransaction: Transaction = {
@@ -83,7 +80,7 @@ export default function App() {
   };
 
   const [validateTransaction, setValidateTransaction] = useState(true);
-  const [transaction, setTransaction] = useState<Transaction[]>([
+  const [transactions, setTransactions] = useState<Transaction[]>([
     dummyTransaction,
   ]);
 
@@ -93,17 +90,17 @@ export default function App() {
     event.preventDefault();
     if (validateTransaction) {
       console.log("Validating your transaction");
-      const isValid = await isTransactionValid(transaction[0]);
+      const isValid = await isTransactionValid(transactions[0]);
       console.log(isValid);
     } else {
       console.log("Miningin your transactions");
-      const minedBlock = await mineTransaction(transaction);
+      const minedBlock = await mineTransaction(transactions);
       console.log(minedBlock);
     }
   }
 
   async function getRandomTransaction(): Promise<void> {
-    setTransaction([]);
+    setTransactions([]);
     let transactionNumber = 1;
 
     if (!validateTransaction) {
@@ -114,16 +111,10 @@ export default function App() {
     for (let i = 0; i < transactionNumber; i++) {
       const response = await fetch("/api/randomTransaction");
       const newTransaction = await response.json();
-      console.log(newTransaction);
-      const isValid = await isTransactionValid(newTransaction.data);
-      if (isValid)
-        setTransaction((prevTransactions: Transaction[]) => [
-          newTransaction,
-          ...prevTransactions,
-        ]);
-      else {
-        transactionNumber--;
-      }
+      setTransactions((prevTransactions: Transaction[]) => [
+        newTransaction,
+        ...prevTransactions,
+      ]);
     }
   }
 
@@ -179,9 +170,9 @@ export default function App() {
               rows={20}
               className="shadow-sm mt-1 block w-full sm:text-sm rounded-md p-4"
               placeholder="Enter your transaction here"
-              value={JSON.stringify(transaction, null, 2)}
+              value={JSON.stringify(transactions, null, 2)}
               onChange={(e) =>
-                setTransaction(JSON.parse(JSON.stringify(e.target.value)))
+                setTransactions(JSON.parse(JSON.stringify(e.target.value)))
               }
             />
           </div>
