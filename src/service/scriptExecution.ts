@@ -181,6 +181,7 @@ export function executeScript(transaction: Transaction): boolean {
           publicKeys
         );
         stack.push(isValid);
+      } else if (token === "OP_0") {
       } else if (token === "OP_SHA256") {
         const data = stack.pop() as string;
         const hashedData = sha256(data);
@@ -189,7 +190,6 @@ export function executeScript(transaction: Transaction): boolean {
         stack.push(token!);
       }
     }
-
 
     // Check if the stack is empty and contains only true values
     for (let i = 0; i < stack.length; i++) {
