@@ -158,7 +158,6 @@ export function executeScript(transaction: Transaction): boolean {
           return false;
         }
         stack.push(bytes);
-      } else if (token === "OP_0") {
       } else if (token === "OP_CHECKMULTISIG") {
         const n = parseInt(
           (stack.pop() as string).substring("OP_PUSHNUM_".length)
@@ -186,31 +185,11 @@ export function executeScript(transaction: Transaction): boolean {
         const data = stack.pop() as string;
         const hashedData = sha256(data);
         stack.push(hashedData);
-      } else if (token === "OP_DROP") {
-        stack.pop();
-      } else if (token === "OP_CSV") {
-        const n = parseInt(
-          (stack.pop() as string).substring("OP_PUSHNUM_".length)
-        );
-        if (n < 0) {
-          return false;
-        }
-      } else if (token === "OP_SWAP") {
-        const top = stack.pop() as string;
-        const second = stack.pop() as string;
-        stack.push(top);
-        stack.push(second);
-      } else if (token === "OP_IF") {
-        const condition = stack.pop();
-        if (condition !== false) {
-          stack.push(true);
-        }
-      } else if (token === "OP_ELSE") {
-      } else if (token === "OP_ENDIF") {
       } else {
-        stack.push(token ?? "");
+        stack.push(token!);
       }
     }
+
 
     // Check if the stack is empty and contains only true values
     for (let i = 0; i < stack.length; i++) {

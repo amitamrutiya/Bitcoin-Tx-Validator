@@ -63,12 +63,14 @@ function serializeLegacyTransaction(
   }
 
   const version = serializeUInt32LE(transaction.version);
+
   const vinLength = Buffer.from(
-    anyOneCanPayFlag
-      ? serializeVarInt(1).toString()
-      : serializeVarInt(transaction.vin.length).toString(),
+    serializeVarInt(anyOneCanPayFlag ? 1 : transaction.vin.length).toString(
+      "hex"
+    ),
     "hex"
   );
+
   const inputs = Buffer.from(
     serializeInputs(transaction.vin, input, anyOneCanPayFlag),
     "hex"
@@ -78,6 +80,8 @@ function serializeLegacyTransaction(
 
   return Buffer.concat([version, vinLength, inputs, outputs, locktime]);
 }
+
+// Function to serialize inputs
 function serializeInputs(
   inputs: TransactionInput[],
   input: TransactionInput,

@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import { executeScript } from "@/service/scriptExecution";
 import { serializeTransaction } from "@/service/serializeTransaction";
@@ -7,11 +7,13 @@ import { calculateTxId } from "@/service/utils";
 import { isValidAddresses } from "@/service/verifyAddress";
 import { Transaction } from "@/types";
 
-export async function isTransactionValid(transaction: Transaction): Promise<boolean> {
+export async function isTransactionValid(
+  transaction: Transaction
+): Promise<boolean> {
   let fee = 0;
   if (!transaction) return false;
 
-  const isValidAddress = await isValidAddresses(transaction);
+  const isValidAddress = isValidAddresses(transaction);
   if (!isValidAddress) {
     console.log("Invalid Address");
     return false;

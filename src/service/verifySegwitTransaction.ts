@@ -103,8 +103,10 @@ function serializeScriptCode(input: TransactionInput): Buffer {
     input.witness.length > 2
   ) {
     const scriptPubKey = input.witness[input.witness.length - 1];
+
     return Buffer.concat([
-      Buffer.from(serializeVarInt(scriptPubKey.length / 2).toString(), "hex"),
+      // @ts-ignore
+      serializeVarInt(scriptPubKey.length / 2),
       Buffer.from(scriptPubKey, "hex"),
     ]);
   }
