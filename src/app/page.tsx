@@ -15,6 +15,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import ReactJson from "@microlink/react-json-view";
+import { JsonViewer } from "@textea/json-viewer";
 
 export default function App() {
   const dummyTransaction: Transaction = {
@@ -139,7 +141,7 @@ export default function App() {
   return (
     <div className="min-h-screen w-full flex justify-center items-center bg-secondary-foreground">
       <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogContent >
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
               {validateTransaction ? (
@@ -193,7 +195,7 @@ export default function App() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <div className="flex flex-col gap-10 border p-20">
+      <div className="flex flex-col gap-10 border p-20 max-w-screen-lg">
         <div className="flex gap-5">
           <button
             onClick={() => setValidateTransaction(true)}
@@ -237,16 +239,35 @@ export default function App() {
         </div>
         <form onSubmit={handleFormSubmit}>
           <div className="mt-1">
-            <textarea
-              id="transaction"
-              name="transaction"
-              rows={20}
-              className="shadow-sm mt-1 block w-full sm:text-sm rounded-md p-4"
-              placeholder="Enter your transaction here"
-              value={JSON.stringify(transactions, null, 2)}
-              onChange={(e) =>
-                setTransactions(JSON.parse(JSON.stringify(e.target.value)))
-              }
+            <JsonViewer
+              value={transactions}
+              editable
+              theme={"dark"}
+              enableDelete
+              displayDataTypes={false}
+              enableClipboard
+              defaultInspectDepth={3}
+              className="p-4 bg-transparent text-lg"
+              onChange={(path, oldValue, newValue) => {
+                setTransactions((prevTransactions) => {
+                  // Create a copy of the transactions array
+                  const newTransactions = [...prevTransactions];
+
+                  // Recursive function to navigate through the path
+                  const updateValue = (obj: any[], path: any, value: any) => {
+                    if (path.length === 1) {
+                      obj[path[0]] = value;
+                    } else {
+                      updateValue(obj[path[0]], path.slice(1), value);
+                    }
+                  };
+
+                  // Update the value at the specified path
+                  updateValue(newTransactions, path, newValue);
+
+                  return newTransactions;
+                });
+              }}
             />
           </div>
           <button
