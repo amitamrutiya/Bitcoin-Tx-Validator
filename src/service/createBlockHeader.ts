@@ -5,18 +5,18 @@ import { createMerkleRoot, toLittleEndian, hash256 } from "./utils";
 function targetToBits(target: string): string {
   let targetBigInt = BigInt("0x" + target);
   let exponent = 0;
-  while (targetBigInt > 0n) {
-    targetBigInt >>= 8n;
+  while (targetBigInt > BigInt(0)) {
+    targetBigInt >>= BigInt(8);
     exponent++;
   }
   let coefficientBigInt =
-    BigInt("0x" + target) >> (8n * (BigInt(exponent) - 3n));
-  if ((coefficientBigInt & 0x00800000n) !== 0n) {
-    coefficientBigInt >>= 8n;
+    BigInt("0x" + target) >> (BigInt(8) * (BigInt(exponent) - BigInt(3)));
+  if ((coefficientBigInt & BigInt(0x00800000)) !== BigInt(0)) {
+    coefficientBigInt >>= BigInt(8);
     exponent++;
   }
   let bitsBigInt =
-    (BigInt(exponent) << 24n) | (coefficientBigInt & 0x007fffffn);
+    (BigInt(exponent) << BigInt(24)) | (coefficientBigInt & BigInt(0x007fffff));
   return bitsBigInt.toString(16).padStart(8, "0");
 }
 

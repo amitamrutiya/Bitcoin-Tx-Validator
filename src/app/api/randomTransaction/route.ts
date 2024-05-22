@@ -1,5 +1,4 @@
 import fs from "fs";
-import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 import path from "path";
 import { promisify } from "util";
@@ -7,10 +6,7 @@ import { promisify } from "util";
 const readdir = promisify(fs.readdir);
 const readFile = promisify(fs.readFile);
 
-export async function GET(
-  req: NextApiRequest,
-  res: NextApiResponse
-): Promise<NextResponse | void> {
+export async function GET(): Promise<NextResponse | void> {
   try {
     const files = await readdir("mempool");
     const randomFile = files[Math.floor(Math.random() * files.length)];
