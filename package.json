@@ -1,26 +1,39 @@
 {
   "name": "amit_amrutiya",
   "version": "1.0.0",
+  "private": true,
   "description": "validate any type of bitcoin address",
-  "main": "index.js",
   "scripts": {
-    "start": "npx tsc && node dist/index.js",
-    "dev": "nodemon --exec ts-node index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "keywords": [],
-  "author": "Your Name",
-  "license": "ISC",
   "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.0.5",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@textea/json-viewer": "^3.4.1",
     "bech32": "^2.0.0",
     "bs58": "^5.0.0",
-    "elliptic": "^6.5.5"
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "elliptic": "^6.5.5",
+    "lucide-react": "^0.379.0",
+    "next": "14.2.3",
+    "react": "^18",
+    "react-dom": "^18",
+    "tailwind-merge": "^2.3.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/elliptic": "^6.4.18",
-    "@types/node": "^20.12.12",
-    "nodemon": "^3.1.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.3",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
   }
 }
