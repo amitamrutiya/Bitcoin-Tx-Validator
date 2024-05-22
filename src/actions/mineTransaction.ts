@@ -13,7 +13,7 @@ export async function mineTransaction(
   transactions: Transaction[]
 ): Promise<Block> {
   transactions.forEach(async (transaction) => {
-    const isValid = await isTransactionValid(transactions[0]);
+    const isValid = await isTransactionValid(transaction);
 
     if (!isValid) {
       console.log("Transaction is not valid");

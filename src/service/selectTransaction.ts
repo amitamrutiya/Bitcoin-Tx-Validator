@@ -34,15 +34,12 @@ export function selectTransaction(transactions: Transaction[]): MyType {
     if (
       !selectedTransaction.includes(transaction) &&
       totalFee + transaction.fee! <= maxFee &&
-      weight + transaction.weight! <= maxWeight // Check if adding this transaction would exceed the maxWeight
+      weight + transaction.weight! <= maxWeight
     ) {
       selectedTransaction.push(transaction);
       totalFee += transaction.fee!;
       weight += transaction.weight!;
     }
   }
-
-  console.log("fee: ", totalFee);
-  console.log("weight: ", weight);
   return { selectedTransaction, totalFee };
 }

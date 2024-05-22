@@ -2,8 +2,19 @@
 
 import { isTransactionValid } from "@/actions/isTransactionValid";
 import { mineTransaction } from "@/actions/mineTransaction";
-import { Transaction } from "@/types";
+import { Block, Transaction } from "@/types";
 import { FormEvent, useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function App() {
   const dummyTransaction: Transaction = {
@@ -83,6 +94,9 @@ export default function App() {
   const [transactions, setTransactions] = useState<Transaction[]>([
     dummyTransaction,
   ]);
+  const [open, setOpen] = useState(false);
+  const [isValid, setIsValid] = useState(false);
+  const [minedBlock, setMinedBlock] = useState<Block>();
 
   async function handleFormSubmit(
     event: FormEvent<HTMLFormElement>
@@ -91,10 +105,14 @@ export default function App() {
     if (validateTransaction) {
       console.log("Validating your transaction");
       const isValid = await isTransactionValid(transactions[0]);
+      setOpen(true);
+      setIsValid(isValid);
       console.log(isValid);
     } else {
       console.log("Miningin your transactions");
       const minedBlock = await mineTransaction(transactions);
+      setOpen(true);
+      setMinedBlock(minedBlock);
       console.log(minedBlock);
     }
   }
@@ -120,6 +138,61 @@ export default function App() {
 
   return (
     <div className="min-h-screen w-full flex justify-center items-center bg-secondary-foreground">
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent >
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {validateTransaction ? (
+                isValid ? (
+                  <span className="text-bold text-3xl">
+                    Transaction is Valid
+                  </span>
+                ) : (
+                  <span className="text-bold text-3xl">
+                    Transaction is not Valid
+                  </span>
+                )
+              ) : minedBlock ? (
+                <span className="text-bold text-3xl">
+                  Block Mined Successfully
+                </span>
+              ) : (
+                <span className="text-bold text-3xl">Error in Mining</span>
+              )}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {validateTransaction ? (
+                isValid ? (
+                  <span className="text-lg">
+                    Your transaction is valid and ready to be mined
+                  </span>
+                ) : (
+                  <span className="text-lg">Your transaction is not valid</span>
+                )
+              ) : minedBlock ? (
+                <div>
+                  <span className="text-lg">Your Mined Block is Here</span>
+                  <textarea
+                    id="transaction"
+                    name="transaction"
+                    rows={30}
+                    className="shadow-sm mt-1 block w-full sm:text-sm rounded-md p-4 "
+                    placeholder="Enter your transaction here"
+                    value={JSON.stringify(minedBlock, null, 2)}
+                    disabled={true}
+                  />
+                </div>
+              ) : (
+                "Error in mining"
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="flex flex-col gap-10 border p-20">
         <div className="flex gap-5">
           <button
