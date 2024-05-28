@@ -189,6 +189,13 @@ function MainCard({ dummyTransaction }: { dummyTransaction: Transaction }) {
                   return newTransactions;
                 });
               }}
+              onDelete={(a, b) => {
+                console.log(a, b);
+              }}
+              enableAdd={true}
+              onAdd={(a) => {
+                console.log(a);
+              }}
             />
           </div>
           <Button
