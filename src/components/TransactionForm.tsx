@@ -25,9 +25,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
-import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
 import { ChevronDown } from "lucide-react";
-
+import { Separator } from "./ui/separator";
 
 const formSchema = z.object({
   type: z.enum(["Legacy", "Segwit"], {
@@ -60,8 +59,10 @@ const formSchema = z.object({
     }
   ),
   locktime: z.number().int().min(0),
+  witness: z.string().min(2),
+  marker: z.string().min(2),
+  flag: z.string().min(2),
 });
-
 function TransactionForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -76,8 +77,13 @@ function TransactionForm() {
       scriptPubKey: "",
       outputType: undefined,
       locktime: 0,
+      witness: "",
+      marker: "00",
+      flag: "01",
     },
   });
+
+  const { watch } = form;
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
@@ -139,6 +145,50 @@ function TransactionForm() {
               </FormItem>
             )}
           />
+          {watch("type") === "Segwit" && (
+            <div className="flex gap-10">
+              <FormField
+                control={form.control}
+                name="marker"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-bold">Marker</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="text"
+                        className="w-[100px]"
+                        disabled
+                      />
+                    </FormControl>
+                    <FormMessage className="text-muted-foreground text-xs">
+                      Marker must be 0x00
+                    </FormMessage>{" "}
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="flag"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-bold">Flag</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="text"
+                        className="w-[100px]"
+                        disabled
+                      />
+                    </FormControl>
+                    <FormMessage className="text-muted-foreground text-xs">
+                      Flag must be 0x01
+                    </FormMessage>{" "}
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
           <div className="flex flex-col space-y-2">
             <p className="text-3xl font-bold">Input</p>
             <div className="border border-primary rounded-md flex flex-col space-y-2 p-2">
@@ -178,7 +228,7 @@ function TransactionForm() {
                 name="scriptSig"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>ScriptSig (ASM)</FormLabel>
+                    <FormLabel className="font-bold">ScriptSig (ASM)</FormLabel>
                     <FormControl>
                       <Textarea className="resize-none" {...field} />
                     </FormControl>
@@ -199,6 +249,23 @@ function TransactionForm() {
                   </FormItem>
                 )}
               />
+              {watch("type") === "Segwit" && (
+                <FormField
+                  control={form.control}
+                  name="witness"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold">
+                        Input 0 Witness Field (Stack Items)
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea className="resize-none" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
           </div>
           <div className="flex flex-col space-y-2">
@@ -313,6 +380,9 @@ function TransactionForm() {
           <Button type="submit">Submit</Button>
         </form>
       </Form>
+      <Separator className="bg-primary my-4" />
+      <p className="text-3xl font-bold">Raw Transaction Data</p>
+      <Textarea className="resize-none my-3" />
     </div>
   );
 }
