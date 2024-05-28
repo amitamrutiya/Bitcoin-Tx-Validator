@@ -1,18 +1,23 @@
 # Bitcoint Tx Validator - Mine My first block
 
-In this project, I simulated the mining process of a block, which involves validating and including transactions from a given set of transactions. This repository contains a folder named mempool that contains JSON files representing individual transactions, some of which may be invalid. The goal was to mine a block by including only the valid transactions. I wrote a script that processes these transactions, validates them, and mines them into a block. The output of my script is stored in a file named `output.txt`.
+In this project, I simulated the mining process of a block, which involves validating and including transactions from a given set of transactions. This repository contains a folder named mempool that contains JSON files representing individual transactions, some of which may be invalid. The goal was to mine a block by including only the valid transactions. I wrote a script that processes these transactions, validates them, and mines them into a block. 
 
 ## Requirements
 ### Input
-- A folder named mempool within this repository containing several JSON files, each representing a transaction with all necessary information for validation.
-- The script must discern valid transactions from invalid ones.
+- Users can enter any type of transaction or generate a random one, each representing a transaction with all necessary information for validation.
 
 ### Output
-The script generates an output file named output.txt with the following structure:
+The script provides feedback to the user on whether the transaction is valid or not:
 
-- First line: The block header.
-- Second line: The serialized coinbase transaction.
-- Following lines: The transaction IDs (txids) of the transactions mined in the block, in order. The first txid should be that of the coinbase transaction.
+- First, it checks if the user entered valid details.
+- If the user enters all valid details, the script runs. If the transaction is not valid, it returns a toast message indicating the transaction is not valid.
+- After validating the transaction, if it is valid, it returns an alert dialog stating the transaction is valid; otherwise, it indicates the transaction is not valid.
+
+For Mining
+
+- Users must enter multiple transactions.
+- Each transaction is first validated.
+- After validation, if all transactions are valid, the user sees an alert dialog with valid block details; otherwise, an error dialog is displayed.
 
 ### Difficulty Target
 - The difficulty target is 0000ffff00000000000000000000000000000000000000000000000000000000. This value specifies that the block hash must be less than this target for the block to be successfully mined.
