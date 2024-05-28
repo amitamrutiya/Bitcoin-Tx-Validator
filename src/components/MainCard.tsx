@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { JsonViewer } from "@textea/json-viewer";
 import { Button } from "@/components/ui/button";
+import TransactionForm from "./TransactionForm";
 
 function MainCard({ dummyTransaction }: { dummyTransaction: Transaction }) {
   const [validateTransaction, setValidateTransaction] = useState(true);
@@ -163,7 +164,7 @@ function MainCard({ dummyTransaction }: { dummyTransaction: Transaction }) {
         </div>
         <form onSubmit={handleFormSubmit}>
           <div className="mt-1">
-            <JsonViewer
+            {/* <JsonViewer
               value={transactions}
               editable
               theme={"dark"}
@@ -196,14 +197,9 @@ function MainCard({ dummyTransaction }: { dummyTransaction: Transaction }) {
               onAdd={(a) => {
                 console.log(a);
               }}
-            />
+            /> */}
+            <TransactionForm />
           </div>
-          <Button
-            type="submit"
-            className="mt-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-secondary bg-primary transform transition duration-300 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Submit
-          </Button>
         </form>
       </div>
     </>
