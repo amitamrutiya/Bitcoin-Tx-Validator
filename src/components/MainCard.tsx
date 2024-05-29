@@ -13,7 +13,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { JsonViewer } from "@textea/json-viewer";
 import { Button } from "@/components/ui/button";
 import TransactionForm from "./TransactionForm";
 
@@ -164,40 +163,6 @@ function MainCard({ dummyTransaction }: { dummyTransaction: Transaction }) {
         </div>
         <form onSubmit={handleFormSubmit}>
           <div className="mt-1">
-            {/* <JsonViewer
-              value={transactions}
-              editable
-              theme={"dark"}
-              enableDelete
-              displayDataTypes={false}
-              enableClipboard
-              defaultInspectDepth={3}
-              className="p-4 bg-transparent text-lg"
-              onChange={(path, oldValue, newValue) => {
-                setTransactions((prevTransactions) => {
-                  const newTransactions = [...prevTransactions];
-
-                  const updateValue = (obj: any[], path: any, value: any) => {
-                    if (path.length === 1) {
-                      obj[path[0]] = value;
-                    } else {
-                      updateValue(obj[path[0]], path.slice(1), value);
-                    }
-                  };
-
-                  updateValue(newTransactions, path, newValue);
-
-                  return newTransactions;
-                });
-              }}
-              onDelete={(a, b) => {
-                console.log(a, b);
-              }}
-              enableAdd={true}
-              onAdd={(a) => {
-                console.log(a);
-              }}
-            /> */}
             <TransactionForm />
           </div>
         </form>

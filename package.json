@@ -19,7 +19,6 @@
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-switch": "^1.0.3",
-    "@textea/json-viewer": "^3.4.1",
     "bech32": "^2.0.0",
     "bs58": "^5.0.0",
     "class-variance-authority": "^0.7.0",
