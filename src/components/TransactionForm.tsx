@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,71 +25,45 @@ import {
   DropdownMenuTrigger,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Plus, X } from "lucide-react";
 import { Separator } from "./ui/separator";
+import {
+  TransactionDefaultValues,
+  transactionSchema,
+  TransactionSchema,
+} from "@/utils/schema";
 
-const formSchema = z.object({
-  type: z.enum(["Legacy", "Segwit"], {
-    required_error: "You need to select a one type of transaction",
-  }),
-  version: z
-    .number()
-    .int()
-    .min(1)
-    .max(2)
-    .refine((value) => value >= 1 && value <= 2, {
-      message: "Version numbers greater than 2 are not yet in use.",
-    }),
-  txid: z
-    .string()
-    .min(64)
-    .max(64)
-    .refine((value) => /^[0-9a-fA-F]+$/.test(value), {
-      message: "Txid must be a valid hexadecimal string.",
-    }),
-  vout: z.number().int().min(0),
-  scriptSig: z.string().min(2),
-  sequence: z.number().int().min(0),
-  amount: z.number().int().min(0),
-  scriptPubKey: z.string().min(2),
-  outputType: z.enum(
-    ["p2pk", "p2pkh", "p2ms", "p2sh", "p2wpkh", "p2wpsh", "p2tr"],
-    {
-      required_error: "You need to select a one type of output",
-    }
-  ),
-  locktime: z.number().int().min(0),
-  witness: z.string().min(2),
-  marker: z.string().min(2),
-  flag: z.string().min(2),
-});
 function TransactionForm() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      type: "Legacy",
-      version: 1,
-      txid: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      vout: 0,
-      scriptSig: "",
-      sequence: 4294967294,
-      amount: 0,
-      scriptPubKey: "",
-      outputType: undefined,
-      locktime: 0,
-      witness: "",
-      marker: "00",
-      flag: "01",
-    },
+  const form = useForm<TransactionSchema>({
+    resolver: zodResolver(transactionSchema),
+    defaultValues: TransactionDefaultValues,
   });
 
   const { watch } = form;
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: TransactionSchema) {
     console.log(values);
   }
 
-  const [position, setPosition] = React.useState("bottom");
+  const [position, setPosition] = useState("Non-Standard");
+  const [inputs, setInputs] = useState(["Input-0"]);
+  const [outputs, setOutputs] = useState(["Output-0"]);
+
+  const handleAddInput = () => {
+    setInputs([...inputs, `Input-${inputs.length}`]);
+  };
+
+  const handleRemoveInput = (input: string) => {
+    setInputs(inputs.filter((i) => i !== input));
+  };
+
+  const handleAddOutput = () => {
+    setOutputs([...outputs, `Output-${outputs.length}`]);
+  };
+
+  const handleRemoveOutput = (output: string) => {
+    setOutputs(outputs.filter((o) => o !== output));
+  };
 
   return (
     <div className="bg-secondary border-b-blue-500  border rounded-lg px-5 py-5 flex flex-col">
@@ -190,177 +164,216 @@ function TransactionForm() {
             </div>
           )}
           <div className="flex flex-col space-y-2">
-            <p className="text-3xl font-bold">Input</p>
-            <div className="border border-primary rounded-md flex flex-col space-y-2 p-2">
-              <FormField
-                control={form.control}
-                name="txid"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold">Txid</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="text" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="vout"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold">Vout</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="1"
-                        {...field}
-                        type="number"
-                        className="w-[150px]"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="scriptSig"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold">ScriptSig (ASM)</FormLabel>
-                    <FormControl>
-                      <Textarea className="resize-none" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="sequence"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold">Sequence</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="number" className="w-[150px]" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {watch("type") === "Segwit" && (
-                <FormField
-                  control={form.control}
-                  name="witness"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-bold">
-                        Input 0 Witness Field (Stack Items)
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea className="resize-none" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+            <p className="text-3xl font-bold">Input {inputs.length}</p>
+            {inputs.map((input, index) => (
+              <>
+                <div className="border border-primary rounded-md flex flex-col space-y-2 p-2">
+                  <div>
+                    <span className="text-muted-foreground">{input}</span>
+                    <Button
+                      type="button"
+                      className="float-right"
+                      size="icon"
+                      onClick={() => handleRemoveInput(input)}
+                    >
+                      <X />
+                    </Button>
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name={`inputs.${index}.txid`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-bold">Txid</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="text" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`inputs.${index}.vout`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-bold">Vout</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="1"
+                            {...field}
+                            type="number"
+                            className="w-[150px]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`inputs.${index}.scriptSig`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-bold">
+                          ScriptSig (ASM)
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea className="resize-none" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`inputs.${index}.sequence`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-bold">Sequence</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="number"
+                            className="w-[150px]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {watch("type") === "Segwit" && (
+                    <FormField
+                      control={form.control}
+                      name={`inputs.${index}.witness`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold">
+                            Input 0 Witness Field (Stack Items)
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea className="resize-none" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   )}
-                />
-              )}
-            </div>
+                </div>
+              </>
+            ))}
+            <Button variant="outline" onClick={handleAddInput} type="button">
+              Add Input <Plus className="h-4 w-4 ml-3 text-muted-foreground" />
+            </Button>
           </div>
           <div className="flex flex-col space-y-2">
-            <p className="text-3xl font-bold">Output</p>
-            <div className="border border-primary rounded-md flex flex-col space-y-2 p-2">
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold">
-                      Amount (satoshis)
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} type="number" className="w-[150px]" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="scriptPubKey"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ScriptPubKey (ASM)</FormLabel>
-                    <FormControl>
-                      <Textarea className="resize-none" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="sequence"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold">Sequence</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="number" className="w-[150px]" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="outputType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <DropdownMenu {...field}>
-                        <DropdownMenuTrigger asChild className="w-72 my-2">
-                          <Button variant="outline">
-                            Non-Standard <ChevronDown />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-96">
-                          <DropdownMenuLabel>Output Type</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuRadioGroup
-                            value={position}
-                            onValueChange={setPosition}
-                          >
-                            <DropdownMenuRadioItem value="p2pk">
-                              P2PK
-                            </DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="p2pkh">
-                              P2PKH
-                            </DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="p2ms">
-                              P2MS
-                            </DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="p2sh">
-                              P2SH
-                            </DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="p2wpkh">
-                              P2WPKH
-                            </DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="p2wpsh">
-                              P2WPSH
-                            </DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="p2tr">
-                              P2TR
-                            </DropdownMenuRadioItem>
-                          </DropdownMenuRadioGroup>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <p className="text-3xl font-bold">Output {outputs.length}</p>
+            {outputs.map((output, index) => (
+              <>
+                <div className="border border-primary rounded-md flex flex-col space-y-2 p-2">
+                  <div>
+                    <span className="text-muted-foreground">{output}</span>
+                    <Button
+                      type="button"
+                      className="float-right"
+                      size="icon"
+                      onClick={() => handleRemoveOutput(output)}
+                    >
+                      <X />
+                    </Button>
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name={`outputs.${index}.amount`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-bold">
+                          Amount (satoshis)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="number"
+                            className="w-[150px]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`outputs.${index}.scriptPubKey`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className=" font-bold">
+                          ScriptPubKey (ASM)
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea className="resize-none" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`outputs.${index}.outputType`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <DropdownMenu {...field}>
+                            <DropdownMenuTrigger asChild className="w-72 my-2">
+                              <Button variant="outline">
+                                {position}
+                                <ChevronDown />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-96">
+                              <DropdownMenuLabel>Output Type</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuRadioGroup
+                                value={position}
+                                onValueChange={setPosition}
+                              >
+                                <DropdownMenuRadioItem value="Non-Standard">
+                                  Non-Standard
+                                </DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="P2PK">
+                                  P2PK
+                                </DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="P2PKH">
+                                  P2PKH
+                                </DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="P2MS">
+                                  P2MS
+                                </DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="P2SH">
+                                  P2SH
+                                </DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="P2WPKH">
+                                  P2WPKH
+                                </DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="P2WPSH">
+                                  P2WPSH
+                                </DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="P2TR">
+                                  P2TR
+                                </DropdownMenuRadioItem>
+                              </DropdownMenuRadioGroup>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </>
+            ))}
+            <Button variant="outline" type="button" onClick={handleAddOutput}>
+              Add Output <Plus className="h-4 w-4 ml-3 text-muted-foreground" />
+            </Button>
           </div>
           <FormField
             control={form.control}
