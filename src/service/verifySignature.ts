@@ -1,4 +1,4 @@
-import { Transaction, TransactionInput } from "../types";
+import { Transaction, TransactionInput } from "../utils/types";
 import verifyLegacyTransaction from "./verifyLegacyTransaction";
 import verifySegwitTransaction from "./verifySegwitTransaction";
 

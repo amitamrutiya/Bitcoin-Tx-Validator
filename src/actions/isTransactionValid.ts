@@ -5,7 +5,7 @@ import { serializeTransaction } from "@/service/serializeTransaction";
 import { serializeWitnessTransaction } from "@/service/serializeWitnessTransaction";
 import { calculateTxId } from "@/service/utils";
 import { isValidAddresses } from "@/service/verifyAddress";
-import { Transaction } from "@/types";
+import { Transaction } from "@/utils/types";
 
 export async function isTransactionValid(
   transaction: Transaction

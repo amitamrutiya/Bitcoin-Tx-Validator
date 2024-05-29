@@ -1,4 +1,4 @@
-import { Transaction } from "../types";
+import { Transaction } from "../utils/types";
 
 type MyType = {
   selectedTransaction: Transaction[];

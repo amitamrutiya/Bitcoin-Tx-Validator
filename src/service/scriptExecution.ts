@@ -1,4 +1,4 @@
-import { Transaction } from "../types";
+import { Transaction } from "../utils/types";
 import { hash160, sha256 } from "./utils";
 import { isValidSignature } from "./verifySignature";
 

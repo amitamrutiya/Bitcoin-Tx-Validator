@@ -1,4 +1,4 @@
-import { Transaction } from "@/types";
+import { Transaction } from "@/utils/types";
 import { createMerkleRoot, toLittleEndian, hash256 } from "./utils";
 
 // Converts the target difficulty into bits for the block header

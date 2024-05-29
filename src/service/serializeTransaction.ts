@@ -1,4 +1,4 @@
-import { Transaction } from "../types";
+import { Transaction } from "../utils/types";
 import { toLittleEndian, serializeVarInt } from "./utils";
 
 // Function to serialize a transaction

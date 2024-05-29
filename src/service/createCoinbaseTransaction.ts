@@ -1,4 +1,4 @@
-import { Transaction } from "../types";
+import { Transaction } from "../utils/types";
 import { createMerkleRoot, hash256 } from "./utils";
 
 // Function to create a coinbase transaction

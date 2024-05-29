@@ -2,7 +2,7 @@
 
 import { isTransactionValid } from "@/actions/isTransactionValid";
 import { mineTransaction } from "@/actions/mineTransaction";
-import { Block, Transaction } from "@/types";
+import { Block, Transaction } from "@/utils/types";
 import { FormEvent, useState } from "react";
 import {
   AlertDialog,

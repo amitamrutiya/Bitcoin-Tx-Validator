@@ -1,4 +1,4 @@
-import { Transaction } from "@/types";
+import { Transaction } from "@/utils/types";
 import MainCard from "@/components/MainCard";
 
 export default function App() {
