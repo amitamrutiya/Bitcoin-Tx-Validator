@@ -29,7 +29,9 @@ type OutputsSectionProps = {
 };
 
 function OutputsSection({
-  form, outputsNumber, setOutputsNumber,
+  form,
+  outputsNumber,
+  setOutputsNumber,
 }: OutputsSectionProps) {
   const handleAddOutput = () => {
     setOutputsNumber([...outputsNumber, outputsNumber.length]);
@@ -65,40 +67,26 @@ function OutputsSection({
               </Button>
             )}
           </div>
-          <div className="flex items-center justify-between my-2">
+          <div className="flex items-center justify-around my-2">
             <FormField
               control={form.control}
               name={`outputs.${index}.amount`}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-bold">Value</FormLabel>
+                  <FormLabel className="font-bold">Amount (Satoshi)</FormLabel>
                   <FormControl>
                     <Input {...field} type="number" className="w-[150px]" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
-              )} />
-            <FormField
-              control={form.control}
-              name={`outputs.${index}.scriptPubKey`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-bold">
-                    {" "}
-                    ScriptPubKey (ASM)
-                  </FormLabel>
-                  <FormControl>
-                    <Input {...field} type="number" className="w-[100px]" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
+              )}
+            />
             <FormField
               control={form.control}
               name={`outputs.${index}.outputType`}
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-bold">Type</FormLabel>
+                <FormItem className="flex flex-col ">
+                  <FormLabel className="font-bold">Output Type</FormLabel>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -116,8 +104,17 @@ function OutputsSection({
                         value={field.value}
                         onValueChange={field.onChange}
                       >
+                        <DropdownMenuRadioItem value="Non-Standard">
+                          Non-Standard
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="P2PK">
+                          P2PK
+                        </DropdownMenuRadioItem>
                         <DropdownMenuRadioItem value="P2PKH">
                           P2PKH
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="P2MS">
+                          P2MS
                         </DropdownMenuRadioItem>
                         <DropdownMenuRadioItem value="P2SH">
                           P2SH
@@ -125,28 +122,33 @@ function OutputsSection({
                         <DropdownMenuRadioItem value="P2WPKH">
                           P2WPKH
                         </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="P2WSH">
-                          P2WSH
+                        <DropdownMenuRadioItem value="P2WPSH">
+                          P2WPSH
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="P2TR">
+                          P2TR
                         </DropdownMenuRadioItem>
                       </DropdownMenuRadioGroup>
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <FormMessage />
                 </FormItem>
-              )} />
+              )}
+            />
           </div>
           <FormField
             control={form.control}
             name={`outputs.${index}.scriptPubKey`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-bold">ScriptPubKey</FormLabel>
+                <FormLabel className="font-bold">ScriptPubKey (ASM)</FormLabel>
                 <FormControl>
                   <Textarea {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
-            )} />
+            )}
+          />
         </div>
       ))}
       <Button type="button" onClick={handleAddOutput}>

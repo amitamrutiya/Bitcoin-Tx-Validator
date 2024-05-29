@@ -134,8 +134,8 @@ function InputsSection({
                 control={form.control}
                 name={`inputs.${index}.prevout.outputType`}
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold">Type</FormLabel>
+                  <FormItem className="flex flex-col  justify-center">
+                    <FormLabel className="font-bold">Output Type</FormLabel>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
@@ -146,15 +146,24 @@ function InputsSection({
                           {field.value} <ChevronDown />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent>
+                      <DropdownMenuContent >
                         <DropdownMenuLabel>Type</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuRadioGroup
                           value={field.value}
                           onValueChange={field.onChange}
                         >
+                          <DropdownMenuRadioItem value="Non-Standard">
+                            Non-Standard
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem value="P2PK">
+                            P2PK
+                          </DropdownMenuRadioItem>
                           <DropdownMenuRadioItem value="P2PKH">
                             P2PKH
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem value="P2MS">
+                            P2MS
                           </DropdownMenuRadioItem>
                           <DropdownMenuRadioItem value="P2SH">
                             P2SH
@@ -162,8 +171,11 @@ function InputsSection({
                           <DropdownMenuRadioItem value="P2WPKH">
                             P2WPKH
                           </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="P2WSH">
-                            P2WSH
+                          <DropdownMenuRadioItem value="P2WPSH">
+                            P2WPSH
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem value="P2TR">
+                            P2TR
                           </DropdownMenuRadioItem>
                         </DropdownMenuRadioGroup>
                       </DropdownMenuContent>
