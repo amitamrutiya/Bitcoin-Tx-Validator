@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useForm, UseFormReturn } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useForm, UseFormReturn, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -17,14 +17,17 @@ import OutputsSection from "./OutputSection";
 import LocktimeField from "./LocktimeField";
 import TransactionMarkerFlag from "./TransactionMarkerFlag";
 
-function TransactionForm() {
+export function TransactionForm({
+  defaultValues,
+}: {
+  defaultValues: TransactionSchema | null;
+}) {
+  console.log(defaultValues);
   const form: UseFormReturn<TransactionSchema> = useForm<TransactionSchema>({
     mode: "all",
     resolver: zodResolver(transactionSchema),
-    defaultValues: TransactionDefaultValues,
+    defaultValues: defaultValues ?? TransactionDefaultValues,
   });
-
-  const { watch } = form;
 
   function onSubmit(values: TransactionSchema) {
     console.log(values);
@@ -34,15 +37,27 @@ function TransactionForm() {
   const [outputsNumber, setOutputsNumber] = useState([0]);
   const [isSegwit, setIsSegwit] = useState<boolean>(false);
 
+  const vin = useWatch({ control: form.control, name: "vin" });
+  const vout = useWatch({ control: form.control, name: "vout" });
+
+  useEffect(() => {
+    form.reset(defaultValues ?? TransactionDefaultValues);
+    if (vin) {
+      setInputsNumber([...Array(vin.length).keys()]);
+    }
+
+    if (vout) {
+      setOutputsNumber([...Array(vout.length).keys()]);
+    }
+  }, [defaultValues]);
+
+  useEffect(() => {}, [vin, vout]);
+
   return (
     <div className="bg-secondary border-b-blue-500 border rounded-lg px-5 py-5 flex flex-col">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-          <TransactionTypeField
-            form={form}
-            isSegwit={isSegwit}
-            setIsSegwit={setIsSegwit}
-          />
+          <TransactionTypeField setIsSegwit={setIsSegwit} />
           <TransactionVersionField form={form} />
           {isSegwit && <TransactionMarkerFlag form={form} />}
           <InputsSection
@@ -66,5 +81,3 @@ function TransactionForm() {
     </div>
   );
 }
-
-export default TransactionForm;

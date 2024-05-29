@@ -8,7 +8,7 @@ export const inputSchema = z.object({
       message: "Txid must be a valid hexadecimal string.",
     }),
   vout: z.coerce.number().int().min(1, "Vout must be greater than 0"),
-  witness: z.array(z.string().min(2, "witness cannot be empty")),
+  witness: z.optional(z.array(z.string().min(2, "witness cannot be empty"))),
   scriptsig: z.optional(z.string()),
   scriptsig_asm: z.string().min(2, "ScriptSig cannot be empty"),
   sequence: z.coerce.number().int().min(0),
@@ -18,13 +18,13 @@ export const inputSchema = z.object({
       .enum(
         [
           "Non-Standard",
-          "P2PK",
-          "P2PKH",
-          "P2MS",
-          "P2SH",
-          "P2WPKH",
-          "P2WPSH",
-          "P2TR",
+          "p2pk",
+          "p2pkh",
+          "p2ms",
+          "p2sh",
+          "p2wpkh",
+          "p2wpsh",
+          "p2tr",
         ],
         {
           required_error: "You need to select a type of output",
@@ -38,6 +38,13 @@ export const inputSchema = z.object({
     scriptpubkey: z.optional(z.string()),
     scriptpubkey_address: z.optional(z.string()),
   }),
+
+  inner_redeemscript_asm: z.optional(
+    z.string().min(2, "RedeemScript cannot be empty")
+  ),
+  inner_witness_script_asm: z.optional(
+    z.string().min(2, "WitnessScript cannot be empty")
+  ),
 });
 
 export const outputSchema = z.object({
@@ -49,13 +56,13 @@ export const outputSchema = z.object({
     .enum(
       [
         "Non-Standard",
-        "P2PK",
-        "P2PKH",
-        "P2MS",
-        "P2SH",
-        "P2WPKH",
-        "P2WPSH",
-        "P2TR",
+        "p2pk",
+        "p2pkh",
+        "p2ms",
+        "p2sh",
+        "p2wpkh",
+        "p2wpsh",
+        "p2tr",
       ],
       {
         required_error: "You need to select a type of output",
@@ -106,6 +113,8 @@ export const outputDefaultValues: OutputSchema = {
   scriptpubkey: "",
   scriptpubkey_address: "",
 };
+
+
 
 export const TransactionDefaultValues: TransactionSchema = {
   version: 1,

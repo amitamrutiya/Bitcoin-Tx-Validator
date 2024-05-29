@@ -14,38 +14,17 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import TransactionForm from "./TransactionForm";
+import { TransactionSchema } from "@/utils/schema";
+import { TransactionForm } from "./TransactionForm";
 
-function MainCard({ dummyTransaction }: { dummyTransaction: Transaction }) {
+function MainCard() {
   const [validateTransaction, setValidateTransaction] = useState(true);
-  const [transactions, setTransactions] = useState<Transaction[]>([
-    dummyTransaction,
-  ]);
+  const [transaction, setTransaction] = useState<TransactionSchema | null>();
   const [open, setOpen] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const [minedBlock, setMinedBlock] = useState<Block>();
 
-  async function handleFormSubmit(
-    event: FormEvent<HTMLFormElement>
-  ): Promise<void> {
-    event.preventDefault();
-    if (validateTransaction) {
-      console.log("Validating your transaction");
-      const isValid = await isTransactionValid(transactions[0]);
-      setOpen(true);
-      setIsValid(isValid);
-      console.log(isValid);
-    } else {
-      console.log("Miningin your transactions");
-      const minedBlock = await mineTransaction(transactions);
-      setOpen(true);
-      setMinedBlock(minedBlock);
-      console.log(minedBlock);
-    }
-  }
-
   async function getRandomTransaction(): Promise<void> {
-    setTransactions([]);
     let transactionNumber = 1;
 
     if (!validateTransaction) {
@@ -56,10 +35,7 @@ function MainCard({ dummyTransaction }: { dummyTransaction: Transaction }) {
     for (let i = 0; i < transactionNumber; i++) {
       const response = await fetch("/api/randomTransaction");
       const newTransaction = await response.json();
-      setTransactions((prevTransactions: Transaction[]) => [
-        newTransaction,
-        ...prevTransactions,
-      ]);
+      setTransaction(newTransaction);
     }
   }
 
@@ -161,7 +137,7 @@ function MainCard({ dummyTransaction }: { dummyTransaction: Transaction }) {
             Random Example
           </Button>
         </div>
-          <TransactionForm />
+        <TransactionForm defaultValues={transaction!} />
       </div>
     </>
   );

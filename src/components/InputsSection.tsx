@@ -48,8 +48,6 @@ function InputsSection({
     );
   };
 
-  const { watch } = form;
-
   return (
     <div className="flex flex-col space-y-2">
       <p className="text-3xl font-bold">Input {inputsNumber.length}</p>
@@ -59,7 +57,7 @@ function InputsSection({
           key={`inputs.${index}`}
         >
           <div>
-            <span className="text-muted-foreground">{`input: ${index}`}</span>
+            <span className="text-muted-foreground">{`Input: ${index}`}</span>
             {index !== 0 && (
               <Button
                 type="button"
@@ -190,10 +188,10 @@ function InputsSection({
           </div>
           <FormField
             control={form.control}
-            name={`vin.${index}.scriptsig`}
+            name={`vin.${index}.scriptsig_asm`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-bold">ScriptSig</FormLabel>
+                <FormLabel className="font-bold">ScriptSig (ASM)</FormLabel>
                 <FormControl>
                   <Textarea {...field} />
                 </FormControl>
