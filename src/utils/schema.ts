@@ -11,6 +11,29 @@ export const inputSchema = z.object({
   vout: z.coerce.number().int().min(1, "Vout must be greater than 0"),
   scriptSig: z.string().min(2, "ScriptSig cannot be empty"),
   sequence: z.coerce.number().int().min(0),
+  prevout: z.object({
+    outputType: z
+      .enum(
+        [
+          "Non-Standard",
+          "P2PK",
+          "P2PKH",
+          "P2MS",
+          "P2SH",
+          "P2WPKH",
+          "P2WPSH",
+          "P2TR",
+        ],
+        {
+          required_error: "You need to select a type of output",
+        }
+      )
+      .refine((value) => value !== "Non-Standard", {
+        message: "Output type cannot be Non-Standard",
+      }),
+    scriptPubKey: z.string().min(2, "ScriptPubKey cannot be empty"),
+    amount: z.coerce.number().int().min(1, "Value must be greater than 0"),
+  }),
 });
 
 export const outputSchema = z.object({
@@ -31,7 +54,7 @@ export const outputSchema = z.object({
       {
         required_error: "You need to select a type of output",
       }
-    ) 
+    )
     .refine((value) => value !== "Non-Standard", {
       message: "Output type cannot be Non-Standard",
     }),
@@ -59,6 +82,12 @@ export const inputDefaultValues: InputSchema = {
   scriptSig: "",
   sequence: 4294967294,
   witness: "",
+  prevout: {
+    // @ts-ignore
+    outputType: "Non-Standard",
+    scriptPubKey: "",
+    amount: 0,
+  },
 };
 
 export const outputDefaultValues: OutputSchema = {
