@@ -161,11 +161,7 @@ function MainCard({ dummyTransaction }: { dummyTransaction: Transaction }) {
             Random Example
           </Button>
         </div>
-        <form onSubmit={handleFormSubmit}>
-          <div className="mt-1">
-            <TransactionForm />
-          </div>
-        </form>
+          <TransactionForm />
       </div>
     </>
   );
