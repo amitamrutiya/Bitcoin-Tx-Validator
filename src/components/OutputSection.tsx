@@ -35,14 +35,14 @@ function OutputsSection({
 }: OutputsSectionProps) {
   const handleAddOutput = () => {
     setOutputsNumber([...outputsNumber, outputsNumber.length]);
-    form.setValue(`outputs.${outputsNumber.length}`, outputDefaultValues);
+    form.setValue(`vout.${outputsNumber.length}`, outputDefaultValues);
   };
 
   const handleRemoveOutput = (index: number) => {
     setOutputsNumber(outputsNumber.filter((_, i) => i !== index));
     form.setValue(
-      `outputs`,
-      form.getValues("outputs").filter((_, i) => i !== index)
+      `vout`,
+      form.getValues("vout").filter((_, i) => i !== index)
     );
   };
 
@@ -70,7 +70,7 @@ function OutputsSection({
           <div className="flex items-center justify-around my-2">
             <FormField
               control={form.control}
-              name={`outputs.${index}.amount`}
+              name={`vout.${index}.value`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-bold">Amount (Satoshi)</FormLabel>
@@ -83,7 +83,7 @@ function OutputsSection({
             />
             <FormField
               control={form.control}
-              name={`outputs.${index}.outputType`}
+              name={`vout.${index}.scriptpubkey_type`}
               render={({ field }) => (
                 <FormItem className="flex flex-col ">
                   <FormLabel className="font-bold">Output Type</FormLabel>
@@ -138,7 +138,7 @@ function OutputsSection({
           </div>
           <FormField
             control={form.control}
-            name={`outputs.${index}.scriptPubKey`}
+            name={`vout.${index}.scriptpubkey_asm`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-bold">ScriptPubKey (ASM)</FormLabel>

@@ -7,12 +7,14 @@ export const inputSchema = z.object({
     .refine((value) => /^[0-9a-fA-F]+$/.test(value), {
       message: "Txid must be a valid hexadecimal string.",
     }),
-  witness: z.string().min(2, "ScriptSig cannot be empty"),
   vout: z.coerce.number().int().min(1, "Vout must be greater than 0"),
-  scriptSig: z.string().min(2, "ScriptSig cannot be empty"),
+  witness: z.array(z.string().min(2, "witness cannot be empty")),
+  scriptsig: z.optional(z.string()),
+  scriptsig_asm: z.string().min(2, "ScriptSig cannot be empty"),
   sequence: z.coerce.number().int().min(0),
+  is_coinbase: z.optional(z.boolean()),
   prevout: z.object({
-    outputType: z
+    scriptpubkey_type: z
       .enum(
         [
           "Non-Standard",
@@ -31,15 +33,19 @@ export const inputSchema = z.object({
       .refine((value) => value !== "Non-Standard", {
         message: "Output type cannot be Non-Standard",
       }),
-    scriptPubKey: z.string().min(2, "ScriptPubKey cannot be empty"),
-    amount: z.coerce.number().int().min(1, "Value must be greater than 0"),
+    scriptpubkey_asm: z.string().min(2, "ScriptPubKey cannot be empty"),
+    value: z.coerce.number().int().min(1, "Value must be greater than 0"),
+    scriptpubkey: z.optional(z.string()),
+    scriptpubkey_address: z.optional(z.string()),
   }),
 });
 
 export const outputSchema = z.object({
-  amount: z.coerce.number().int().min(1, "Amount must be greater than 0"),
-  scriptPubKey: z.string().min(2, "ScriptPubKey cannot be empty"),
-  outputType: z
+  value: z.coerce.number().int().min(1, "Amount must be greater than 0"),
+  scriptpubkey: z.optional(z.string()),
+  scriptpubkey_address: z.optional(z.string()),
+  scriptpubkey_asm: z.string().min(2, "ScriptPubKey cannot be empty"),
+  scriptpubkey_type: z
     .enum(
       [
         "Non-Standard",
@@ -61,13 +67,10 @@ export const outputSchema = z.object({
 });
 
 export const transactionSchema = z.object({
-  type: z.enum(["Legacy", "Segwit"]),
   version: z.coerce.number().int().min(1).max(2),
   locktime: z.coerce.number().int().min(0),
-  marker: z.string().min(2),
-  flag: z.string().min(2),
-  inputs: z.array(inputSchema),
-  outputs: z.array(outputSchema),
+  vin: z.array(inputSchema),
+  vout: z.array(outputSchema),
 });
 
 export type InputSchema = z.infer<typeof inputSchema>;
@@ -79,38 +82,34 @@ export type TransactionSchema = z.infer<typeof transactionSchema>;
 export const inputDefaultValues: InputSchema = {
   txid: "a".repeat(64),
   vout: 0,
-  scriptSig: "",
   sequence: 4294967294,
-  witness: "",
+  scriptsig_asm: "",
+  is_coinbase: false,
+  scriptsig: "",
+  witness: [],
   prevout: {
+    scriptpubkey_asm: "",
     // @ts-ignore
-    outputType: "Non-Standard",
-    scriptPubKey: "",
+    scriptpubkey_type: "Non-Standard",
+    value: 0,
+    scriptpubkey: "",
+    scriptpubkey_address: "",
     amount: 0,
   },
 };
 
 export const outputDefaultValues: OutputSchema = {
-  amount: 0,
-  scriptPubKey: "",
+  value: 0,
+  scriptpubkey_asm: "",
   // @ts-ignore
-  outputType: "Non-Standard" as
-    | "Non-Standard"
-    | "P2PK"
-    | "P2PKH"
-    | "P2MS"
-    | "P2SH"
-    | "P2WPKH"
-    | "P2WPSH"
-    | "P2TR",
+  scriptpubkey_type: "Non-Standard",
+  scriptpubkey: "",
+  scriptpubkey_address: "",
 };
 
 export const TransactionDefaultValues: TransactionSchema = {
-  type: "Legacy",
   version: 1,
-  inputs: [inputDefaultValues],
-  outputs: [outputDefaultValues],
+  vin: [inputDefaultValues],
+  vout: [outputDefaultValues],
   locktime: 0,
-  marker: "00",
-  flag: "01",
 };

@@ -1,53 +1,29 @@
-import React from "react";
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { TransactionSchema } from "@/utils/schema";
-import { UseFormReturn } from "react-hook-form";
+import { Label } from "./ui/label";
 
 type TransactionTypeFieldProps = {
-  form: UseFormReturn<TransactionSchema>;
+  setIsSegwit: (value: boolean) => void;
 };
 
-function TransactionTypeField({ form }: TransactionTypeFieldProps) {
+function TransactionTypeField({ setIsSegwit }: TransactionTypeFieldProps) {
   return (
-    <FormField
-      control={form.control}
-      name="type"
-      render={({ field }) => (
-        <FormItem className="space-y-1 w-min">
-          <FormLabel className="font-bold" htmlFor="type">
-            Type
-          </FormLabel>
-          <FormControl>
-            <RadioGroup
-              onValueChange={field.onChange}
-              defaultValue={field.value}
-              className="flex space-y-1 border border-primary rounded-md p-2"
-            >
-              <FormItem className="flex items-center space-x-3 space-y-0">
-                <FormControl>
-                  <RadioGroupItem value="Legacy" />
-                </FormControl>
-                <FormLabel className="font-normal">Legacy</FormLabel>
-              </FormItem>
-              <FormItem className="flex items-center space-x-3 space-y-0">
-                <FormControl>
-                  <RadioGroupItem value="Segwit" />
-                </FormControl>
-                <FormLabel className="font-normal">Segwit</FormLabel>
-              </FormItem>
-            </RadioGroup>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
+    <div className="flex gap-4">
+      <p className=" text-sm font-bold"> Type</p>
+      <RadioGroup
+        defaultValue="legacy"
+        className="flex"
+        onValueChange={(value) => setIsSegwit(value === "segwit")}
+      >
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="legacy" id="r1" />
+          <Label htmlFor="r1">Legacy</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="segwit" id="r2" />
+          <Label htmlFor="r2">Segwit</Label>
+        </div>
+      </RadioGroup>
+    </div>
   );
 }
 

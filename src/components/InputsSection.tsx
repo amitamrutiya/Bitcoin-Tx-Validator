@@ -24,25 +24,27 @@ import { UseFormReturn } from "react-hook-form";
 
 type InputsSectionProps = {
   form: UseFormReturn<TransactionSchema>;
+  isSegwit: boolean;
   inputsNumber: number[];
   setInputsNumber: (value: number[]) => void;
 };
 
 function InputsSection({
   form,
+  isSegwit,
   inputsNumber,
   setInputsNumber,
 }: InputsSectionProps) {
   const handleAddInput = () => {
     setInputsNumber([...inputsNumber, inputsNumber.length]);
-    form.setValue(`inputs.${inputsNumber.length}`, inputDefaultValues);
+    form.setValue(`vin.${inputsNumber.length}`, inputDefaultValues);
   };
 
   const handleRemoveInput = (index: number) => {
     setInputsNumber(inputsNumber.filter((_, i) => i !== index));
     form.setValue(
-      `inputs`,
-      form.getValues("inputs").filter((_, i) => i !== index)
+      `vin`,
+      form.getValues("vin").filter((_, i) => i !== index)
     );
   };
 
@@ -72,7 +74,7 @@ function InputsSection({
           <div className="flex gap-10">
             <FormField
               control={form.control}
-              name={`inputs.${index}.txid`}
+              name={`vin.${index}.txid`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-bold">Txid</FormLabel>
@@ -85,7 +87,7 @@ function InputsSection({
             />
             <FormField
               control={form.control}
-              name={`inputs.${index}.vout`}
+              name={`vin.${index}.vout`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-bold">Vout</FormLabel>
@@ -101,7 +103,7 @@ function InputsSection({
             <p>Previous Output</p>
             <FormField
               control={form.control}
-              name={`inputs.${index}.prevout.scriptPubKey`}
+              name={`vin.${index}.prevout.scriptpubkey_asm`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-bold">
@@ -117,7 +119,7 @@ function InputsSection({
             <div className="flex items-center justify-around my-2">
               <FormField
                 control={form.control}
-                name={`inputs.${index}.prevout.amount`}
+                name={`vin.${index}.prevout.value`}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-bold">
@@ -132,7 +134,7 @@ function InputsSection({
               />
               <FormField
                 control={form.control}
-                name={`inputs.${index}.prevout.outputType`}
+                name={`vin.${index}.prevout.scriptpubkey_type`}
                 render={({ field }) => (
                   <FormItem className="flex flex-col  justify-center">
                     <FormLabel className="font-bold">Output Type</FormLabel>
@@ -146,7 +148,7 @@ function InputsSection({
                           {field.value} <ChevronDown />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent >
+                      <DropdownMenuContent>
                         <DropdownMenuLabel>Type</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuRadioGroup
@@ -188,7 +190,7 @@ function InputsSection({
           </div>
           <FormField
             control={form.control}
-            name={`inputs.${index}.scriptSig`}
+            name={`vin.${index}.scriptsig`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-bold">ScriptSig</FormLabel>
@@ -199,10 +201,10 @@ function InputsSection({
               </FormItem>
             )}
           />
-          {watch("type") === "Segwit" && (
+          {isSegwit && (
             <FormField
               control={form.control}
-              name={`inputs.${index}.witness`}
+              name={`vin.${index}.witness`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-bold">Witness</FormLabel>
@@ -216,7 +218,7 @@ function InputsSection({
           )}
           <FormField
             control={form.control}
-            name={`inputs.${index}.sequence`}
+            name={`vin.${index}.sequence`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-bold">Sequence</FormLabel>

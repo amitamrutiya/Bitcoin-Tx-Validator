@@ -1,32 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Form } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuRadioItem,
-} from "@/components/ui/dropdown-menu";
-import { ChevronDown, Plus, X } from "lucide-react";
 import { Separator } from "./ui/separator";
 import {
-  inputDefaultValues,
-  outputDefaultValues,
   TransactionDefaultValues,
   transactionSchema,
   TransactionSchema,
@@ -48,21 +27,27 @@ function TransactionForm() {
   const { watch } = form;
 
   function onSubmit(values: TransactionSchema) {
-    console.log(values.inputs);
+    console.log(values);
   }
 
   const [inputsNumber, setInputsNumber] = useState([0]);
   const [outputsNumber, setOutputsNumber] = useState([0]);
+  const [isSegwit, setIsSegwit] = useState<boolean>(false);
 
   return (
     <div className="bg-secondary border-b-blue-500 border rounded-lg px-5 py-5 flex flex-col">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-          <TransactionTypeField form={form} />
+          <TransactionTypeField
+            form={form}
+            isSegwit={isSegwit}
+            setIsSegwit={setIsSegwit}
+          />
           <TransactionVersionField form={form} />
-          {watch("type") === "Segwit" && <TransactionMarkerFlag form={form} />}
+          {isSegwit && <TransactionMarkerFlag form={form} />}
           <InputsSection
             form={form}
+            isSegwit={isSegwit}
             inputsNumber={inputsNumber}
             setInputsNumber={setInputsNumber}
           />
