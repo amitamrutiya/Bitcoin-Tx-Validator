@@ -85,8 +85,7 @@ export const inputDefaultValues: TransactionInputSchema = {
     scriptpubkey_type: "Non-Standard",
     value: 0,
     scriptpubkey: "",
-    scriptpubkey_address: "",
-    amount: 0,
+    scriptpubkey_address: ""
   },
 };
 
