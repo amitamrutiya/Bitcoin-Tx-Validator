@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useForm, UseFormReturn, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -29,15 +29,9 @@ import {
 
 type TransactionFormProps = {
   defaultValues: TransactionSchema | null;
-  isSegwit: boolean;
-  setIsSegwit: (value: boolean) => void;
 };
 
-export function TransactionForm({
-  defaultValues,
-  isSegwit,
-  setIsSegwit,
-}: TransactionFormProps) {
+export function TransactionForm({ defaultValues }: TransactionFormProps) {
   const form: UseFormReturn<TransactionSchema> = useForm<TransactionSchema>({
     mode: "all",
     resolver: zodResolver(transactionSchema),
@@ -45,6 +39,13 @@ export function TransactionForm({
   });
   const [serializeTransaction, setSerializeTransaction] = useState<string>("");
   const [isValid, setIsValid] = useState<boolean>(false);
+  const [isSegwit, setIsSegwit] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (defaultValues) {
+      setIsSegwit(defaultValues.vin.some((tx) => tx.witness !== undefined));
+    }
+  }, [defaultValues]);
 
   async function onSubmit(values: TransactionSchema) {
     try {

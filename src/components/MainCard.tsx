@@ -22,18 +22,13 @@ import { mineTransaction } from "@/actions/mineTransaction";
 
 function MainCard() {
   const [validateTransaction, setValidateTransaction] = useState(true);
-  const [transaction, setTransaction] = useState<TransactionSchema | null>();
   const [open, setOpen] = useState(false);
-  const [isValid, setIsValid] = useState(false);
   const [minedBlock, setMinedBlock] = useState<Block>();
-  const [isSegwit, setIsSegwit] = useState<boolean>(false);
-  const [transactionNumbers, setTransactionNumbers] = useState([0]);
-  const [allTransactions, setAllTransactions] = useState<TransactionSchema[]>(
-    []
-  );
+  const [allTransactions, setAllTransactions] = useState<TransactionSchema[]>([
+    TransactionDefaultValues,
+  ]);
 
   function handleAddTransaction() {
-    setTransactionNumbers([...transactionNumbers, transactionNumbers.length]);
     setAllTransactions((prevTransactions: TransactionSchema[]) => [
       TransactionDefaultValues,
       ...prevTransactions,
@@ -41,7 +36,6 @@ function MainCard() {
   }
 
   async function getRandomTransaction(): Promise<void> {
-    setAllTransactions([]);
     let transactionNumber = 1;
 
     if (!validateTransaction) {
@@ -52,13 +46,11 @@ function MainCard() {
     for (let i = 0; i < transactionNumber; i++) {
       const response = await fetch("/api/randomTransaction");
       const newTransaction = await response.json();
+      if (validateTransaction) setAllTransactions([]);
       const isSegwit = newTransaction.vin.some(
         (input: TransactionInputSchema) => input.witness !== undefined
       );
 
-      console.log("Transaction: ", newTransaction);
-      setIsSegwit(isSegwit);
-      setTransaction(newTransaction);
       setAllTransactions((prevTransactions: TransactionSchema[]) => [
         newTransaction,
         ...prevTransactions,
@@ -67,28 +59,24 @@ function MainCard() {
   }
 
   async function handleMineBlock(): Promise<void> {
-    const minedBlock = await mineTransaction(allTransactions);
+    try {
+      const minedBlock = await mineTransaction(allTransactions);
+      setMinedBlock(minedBlock);
+    } catch (error) {
+      setMinedBlock(undefined);
+    } finally {
+      setOpen(true);
+    }
     setOpen(true);
-    setMinedBlock(minedBlock);
-    console.log(minedBlock);
   }
+
   return (
     <>
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {validateTransaction ? (
-                isValid ? (
-                  <span className="text-bold text-3xl">
-                    Transaction is Valid
-                  </span>
-                ) : (
-                  <span className="text-bold text-3xl">
-                    Transaction is not Valid
-                  </span>
-                )
-              ) : minedBlock ? (
+              {minedBlock ? (
                 <span className="text-bold text-3xl">
                   Block Mined Successfully
                 </span>
@@ -97,15 +85,7 @@ function MainCard() {
               )}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {validateTransaction ? (
-                isValid ? (
-                  <span className="text-lg">
-                    Your transaction is valid and ready to be mined
-                  </span>
-                ) : (
-                  <span className="text-lg">Your transaction is not valid</span>
-                )
-              ) : minedBlock ? (
+              {minedBlock ? (
                 <div>
                   <span className="text-lg">Your Mined Block is Here</span>
                   <textarea
@@ -174,8 +154,6 @@ function MainCard() {
           <TransactionForm
             key={tx.TxId}
             defaultValues={tx!}
-            isSegwit={isSegwit}
-            setIsSegwit={setIsSegwit}
           />
         ))}
 

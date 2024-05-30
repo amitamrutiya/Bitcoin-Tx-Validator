@@ -13,7 +13,6 @@ export async function GET(): Promise<NextResponse | void> {
     const filePath = path.join("mempool", randomFile);
     const data = await readFile(filePath, "utf8");
     const transaction = JSON.parse(data);
-    console.log("Transaction: ", transaction);
     return NextResponse.json(transaction);
   } catch (err) {
     return NextResponse.json({ error: err });
