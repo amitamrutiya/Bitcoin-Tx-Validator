@@ -1,8 +1,7 @@
 "use client";
 
-import { mineTransaction } from "@/actions/mineTransaction";
 import { Block } from "@/utils/types";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,8 +12,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { TransactionInputSchema, TransactionSchema } from "@/utils/schema";
+import {
+  TransactionDefaultValues,
+  TransactionInputSchema,
+  TransactionSchema,
+} from "@/utils/schema";
 import { TransactionForm } from "./TransactionForm";
+import { mineTransaction } from "@/actions/mineTransaction";
 
 function MainCard() {
   const [validateTransaction, setValidateTransaction] = useState(true);
@@ -23,8 +27,21 @@ function MainCard() {
   const [isValid, setIsValid] = useState(false);
   const [minedBlock, setMinedBlock] = useState<Block>();
   const [isSegwit, setIsSegwit] = useState<boolean>(false);
+  const [transactionNumbers, setTransactionNumbers] = useState([0]);
+  const [allTransactions, setAllTransactions] = useState<TransactionSchema[]>(
+    []
+  );
+
+  function handleAddTransaction() {
+    setTransactionNumbers([...transactionNumbers, transactionNumbers.length]);
+    setAllTransactions((prevTransactions: TransactionSchema[]) => [
+      TransactionDefaultValues,
+      ...prevTransactions,
+    ]);
+  }
 
   async function getRandomTransaction(): Promise<void> {
+    setAllTransactions([]);
     let transactionNumber = 1;
 
     if (!validateTransaction) {
@@ -42,9 +59,19 @@ function MainCard() {
       console.log("Transaction: ", newTransaction);
       setIsSegwit(isSegwit);
       setTransaction(newTransaction);
+      setAllTransactions((prevTransactions: TransactionSchema[]) => [
+        newTransaction,
+        ...prevTransactions,
+      ]);
     }
   }
 
+  async function handleMineBlock(): Promise<void> {
+    const minedBlock = await mineTransaction(allTransactions);
+    setOpen(true);
+    setMinedBlock(minedBlock);
+    console.log(minedBlock);
+  }
   return (
     <>
       <AlertDialog open={open} onOpenChange={setOpen}>
@@ -101,7 +128,7 @@ function MainCard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <div className="flex flex-col gap-10 border md:p-20 sm:p-10 p-5 m-5">
+      <div className="flex flex-col gap-5 border md:p-20 sm:p-10 p-5 m-5">
         <div className="flex gap-5">
           <Button
             onClick={() => setValidateTransaction(true)}
@@ -143,11 +170,30 @@ function MainCard() {
             Random Example
           </Button>
         </div>
-        <TransactionForm
-          defaultValues={transaction!}
-          isSegwit={isSegwit}
-          setIsSegwit={setIsSegwit}
-        />
+        {allTransactions.map((tx) => (
+          <TransactionForm
+            key={tx.TxId}
+            defaultValues={tx!}
+            isSegwit={isSegwit}
+            setIsSegwit={setIsSegwit}
+          />
+        ))}
+
+        {!validateTransaction && (
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleAddTransaction}
+          >
+            Add Transaction
+          </Button>
+        )}
+
+        {!validateTransaction && (
+          <Button type="button" variant="secondary" onClick={handleMineBlock}>
+            Mine Block
+          </Button>
+        )}
       </div>
     </>
   );

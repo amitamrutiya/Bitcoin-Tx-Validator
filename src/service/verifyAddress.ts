@@ -96,7 +96,7 @@ export function isValidAddresses(transaction: TransactionSchema): boolean {
           input.prevout.scriptpubkey_address
       );
       isValid = false;
-      break;
+      return isValid;
     }
     isValid = true;
   }

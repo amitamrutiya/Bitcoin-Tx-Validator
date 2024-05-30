@@ -10,9 +10,12 @@ import { TransactionSchema } from "@/utils/schema";
 
 export async function isTransactionValid(
   transaction: TransactionSchema
-): Promise<boolean> {
+): Promise<{ isValid: boolean; seralizedTransaction: string }> {
   let fee = 0;
-  if (!transaction) return false;
+  if (!transaction) return { isValid: false, seralizedTransaction: "" };
+  let isSegwit = false;
+
+  isSegwit = transaction.vin.some((tx) => tx.witness !== undefined);
 
   transaction.vin.forEach((input) => {
     input.prevout.scriptpubkey = asmToHex(input.prevout.scriptpubkey_asm);
@@ -25,9 +28,9 @@ export async function isTransactionValid(
   const isValidAddress = isValidAddresses(transaction);
   if (!isValidAddress) {
     console.log("Invalid Address");
-    return false;
+    return { isValid: false, seralizedTransaction: "" };
   }
-  console.log("Valid Address")
+  console.log("Valid Address");
   // Transaction ID Validation
   const serializedTransaction = serializeTransaction(transaction);
   const TxId = calculateTxId(serializedTransaction);
@@ -41,7 +44,7 @@ export async function isTransactionValid(
   const result = executeScript(transaction);
   if (!result) {
     console.log("Script and Signature Validation failed");
-    return false;
+    return { isValid: false, seralizedTransaction: "" };
   }
 
   // Output Validation
@@ -55,10 +58,15 @@ export async function isTransactionValid(
   );
   if (outputTotal > inputTotal) {
     console.log("Output total exceeds input total");
-    return false; // Output total exceeds input total
+    return { isValid: false, seralizedTransaction: "" };
   }
   fee = inputTotal - outputTotal;
   transaction.fee = fee;
 
-  return true;
+  return {
+    isValid: true,
+    seralizedTransaction: isSegwit
+      ? serializedWitnessTransaction
+      : serializedTransaction,
+  };
 }

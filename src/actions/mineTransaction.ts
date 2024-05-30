@@ -1,16 +1,17 @@
 "use server";
 
-import { Block, Transaction } from "@/utils/types";
-import { isTransactionValid } from "./isTransactionValid.1";
+import { Block } from "@/utils/types";
 import { createBlockHeader } from "@/service/createBlockHeader";
 import { createCoinbaseTransaction } from "@/service/createCoinbaseTransaction";
 import { selectTransaction } from "@/service/selectTransaction";
 import { serializeTransaction } from "@/service/serializeTransaction";
 import { serializeWitnessTransaction } from "@/service/serializeWitnessTransaction";
 import { serializeVarInt, calculateTxId } from "@/service/utils";
+import { TransactionSchema } from "@/utils/schema";
+import { isTransactionValid } from "./isTransactionValid";
 
 export async function mineTransaction(
-  transactions: Transaction[]
+  transactions: TransactionSchema[]
 ): Promise<Block> {
   transactions.forEach(async (transaction) => {
     const isValid = await isTransactionValid(transaction);
@@ -21,7 +22,7 @@ export async function mineTransaction(
     }
   });
   type MyType = {
-    selectedTransaction: Transaction[];
+    selectedTransaction: TransactionSchema[];
     totalFee: number;
   };
   // Sort transactions by fee and size
@@ -42,7 +43,7 @@ export async function mineTransaction(
   // Create Block Header
   const blockHeader = createBlockHeader(selectedTransaction);
   const transactionsTxIds = selectedTransaction.map(
-    (tx: Transaction) => tx.TxId!
+    (tx: TransactionSchema) => tx.TxId!
   );
 
   const data = `${blockHeader}

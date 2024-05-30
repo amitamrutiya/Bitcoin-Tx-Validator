@@ -17,6 +17,15 @@ import OutputsSection from "./OutputSection";
 import LocktimeField from "./LocktimeField";
 import TransactionMarkerFlag from "./TransactionMarkerFlag";
 import { isTransactionValid } from "@/actions/isTransactionValid";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "./ui/alert-dialog";
 
 type TransactionFormProps = {
   defaultValues: TransactionSchema | null;
@@ -34,11 +43,20 @@ export function TransactionForm({
     resolver: zodResolver(transactionSchema),
     defaultValues: defaultValues ?? TransactionDefaultValues,
   });
+  const [serializeTransaction, setSerializeTransaction] = useState<string>("");
+  const [isValid, setIsValid] = useState<boolean>(false);
 
   async function onSubmit(values: TransactionSchema) {
-    const valid = await isTransactionValid(values);
-    console.log(values);
-    console.log("Transaction is valid: ", valid);
+    try {
+      const data = await isTransactionValid(values);
+      setIsValid(data.isValid);
+      setSerializeTransaction(data.seralizedTransaction);
+    } catch (error) {
+      console.log(error);
+      setIsValid(false);
+    } finally {
+      setOpen(true);
+    }
   }
 
   const [inputsNumber, setInputsNumber] = useState([0]);
@@ -61,8 +79,38 @@ export function TransactionForm({
     }
   }, [vin, vout]);
 
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="bg-secondary border-b-blue-500 border rounded-lg p-5 flex flex-col">
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {isValid ? (
+                <span className="text-bold text-3xl">Transaction is Valid</span>
+              ) : (
+                <span className="text-bold text-3xl">
+                  Transaction is not Valid
+                </span>
+              )}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {isValid ? (
+                <span className="text-lg">
+                  Your transaction is valid and ready to be mined
+                </span>
+              ) : (
+                <span className="text-lg">Your transaction is not valid</span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
           <TransactionTypeField setIsSegwit={setIsSegwit} isSegwit={isSegwit} />
@@ -85,7 +133,12 @@ export function TransactionForm({
       </Form>
       <Separator className="bg-primary my-4" />
       <p className="text-3xl font-bold">Raw Transaction Data</p>
-      <Textarea className="resize-none my-3" />
+      <Textarea
+        className="resize-none my-3"
+        defaultValue={serializeTransaction}
+        disabled
+        rows={6}
+      />
     </div>
   );
 }
