@@ -49,6 +49,9 @@ export function TransactionForm({
 
   useEffect(() => {
     form.reset(defaultValues ?? TransactionDefaultValues);
+  }, [defaultValues, form]);
+
+  useEffect(() => {
     if (vin) {
       setInputsNumber([...Array(vin.length).keys()]);
     }
@@ -56,9 +59,7 @@ export function TransactionForm({
     if (vout) {
       setOutputsNumber([...Array(vout.length).keys()]);
     }
-  }, [defaultValues]);
-
-  useEffect(() => {}, [vin, vout]);
+  }, [vin, vout]);
 
   return (
     <div className="bg-secondary border-b-blue-500 border rounded-lg px-5 py-5 flex flex-col">

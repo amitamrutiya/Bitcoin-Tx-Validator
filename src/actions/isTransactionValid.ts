@@ -27,7 +27,7 @@ export async function isTransactionValid(
     console.log("Invalid Address");
     return false;
   }
-
+  console.log("Valid Address")
   // Transaction ID Validation
   const serializedTransaction = serializeTransaction(transaction);
   const TxId = calculateTxId(serializedTransaction);
@@ -40,6 +40,7 @@ export async function isTransactionValid(
   // Script and Signature Validation
   const result = executeScript(transaction);
   if (!result) {
+    console.log("Script and Signature Validation failed");
     return false;
   }
 

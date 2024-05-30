@@ -17,8 +17,7 @@ export function executeScript(transaction: TransactionSchema): boolean {
       scriptTokens = script.split(" ");
     } else if (
       input.prevout.scriptpubkey_type === "p2sh" &&
-      input.witness === undefined &&
-      !input.inner_redeemscript_asm?.split(" ").includes("OP_CSV")
+      input.witness === undefined
     ) {
       // Pay-to-Script-Hash (P2SH)
       const scriptsig_asm = input.scriptsig_asm!.split(" ");

@@ -1,8 +1,7 @@
 "use client";
 
-import { isTransactionValid } from "@/actions/isTransactionValid.1";
 import { mineTransaction } from "@/actions/mineTransaction";
-import { Block, Transaction, TransactionInput } from "@/utils/types";
+import { Block } from "@/utils/types";
 import { FormEvent, useState } from "react";
 import {
   AlertDialog,
@@ -14,7 +13,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { TransactionSchema } from "@/utils/schema";
+import { TransactionInputSchema, TransactionSchema } from "@/utils/schema";
 import { TransactionForm } from "./TransactionForm";
 
 function MainCard() {
@@ -37,8 +36,10 @@ function MainCard() {
       const response = await fetch("/api/randomTransaction");
       const newTransaction = await response.json();
       const isSegwit = newTransaction.vin.some(
-        (input: TransactionInput) => input.witness !== undefined
+        (input: TransactionInputSchema) => input.witness !== undefined
       );
+
+      console.log("Transaction: ", newTransaction);
       setIsSegwit(isSegwit);
       setTransaction(newTransaction);
     }

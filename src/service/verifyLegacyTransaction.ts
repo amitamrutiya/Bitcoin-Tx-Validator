@@ -18,6 +18,7 @@ export default function verifyLegacyTransaction(
   publicKeys: string[]
 ): boolean {
   const serialized = serializeLegacyTransaction(transaction, input, signatures);
+  console.log("serialized: ", serialized);
   let validCount = 0;
   for (const signature of signatures) {
     for (const publicKey of publicKeys) {
