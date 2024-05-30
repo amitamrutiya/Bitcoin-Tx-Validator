@@ -149,6 +149,21 @@ function OutputsSection({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name={`vout.${index}.scriptpubkey_address`}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold">
+                  ScriptPubKey Address
+                </FormLabel>
+                <FormControl>
+                  <Input {...field} type="text" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
       ))}
       <Button type="button" onClick={handleAddOutput}>

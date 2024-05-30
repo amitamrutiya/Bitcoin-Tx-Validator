@@ -114,6 +114,21 @@ function InputsSection({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name={`vin.${index}.prevout.scriptpubkey_address`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold">
+                    ScriptPubKey Address
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} type="text" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="flex items-center justify-around my-2">
               <FormField
                 control={form.control}

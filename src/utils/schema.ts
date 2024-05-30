@@ -3,7 +3,7 @@ import { z } from "zod";
 export const outputSchema = z.object({
   value: z.coerce.number().int().min(1, "Amount must be greater than 0"),
   scriptpubkey: z.optional(z.string()),
-  scriptpubkey_address: z.optional(z.string()),
+  scriptpubkey_address: z.string().min(2, "Address cannot be empty"),
   scriptpubkey_asm: z.string().min(2, "ScriptPubKey cannot be empty"),
   scriptpubkey_type: z
     .enum(
@@ -38,7 +38,7 @@ export const inputSchema = z.object({
   vout: z.coerce.number().int().min(0, "Vout must be greater than 0"),
   witness: z.optional(z.array(z.string().min(2, "witness cannot be empty"))),
   scriptsig: z.optional(z.string()),
-  scriptsig_asm: z.optional(z.string().min(2, "ScriptSig cannot be empty")),
+  scriptsig_asm: z.optional(z.string()),
   sequence: z.coerce.number().int().min(0),
   is_coinbase: z.optional(z.boolean()),
   prevout: outputSchema,

@@ -16,7 +16,7 @@ import InputsSection from "./InputsSection";
 import OutputsSection from "./OutputSection";
 import LocktimeField from "./LocktimeField";
 import TransactionMarkerFlag from "./TransactionMarkerFlag";
-import { isTransactionValid } from "@/actions/isTransactionValid.1";
+import { isTransactionValid } from "@/actions/isTransactionValid";
 
 type TransactionFormProps = {
   defaultValues: TransactionSchema | null;
@@ -36,9 +36,9 @@ export function TransactionForm({
   });
 
   async function onSubmit(values: TransactionSchema) {
-    const isValid = await isTransactionValid(values);
+    const valid = await isTransactionValid(values);
     console.log(values);
-    console.log("Transaction is valid: ", isValid);
+    console.log("Transaction is valid: ", valid);
   }
 
   const [inputsNumber, setInputsNumber] = useState([0]);
