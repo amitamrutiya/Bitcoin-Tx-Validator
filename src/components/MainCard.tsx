@@ -44,12 +44,15 @@ function MainCard() {
     }
 
     for (let i = 0; i < transactionNumber; i++) {
-      const response = await fetch("/api/randomTransaction");
+      const response = await fetch("/api/randomTransaction", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
       const newTransaction = await response.json();
       if (validateTransaction) setAllTransactions([]);
-      const isSegwit = newTransaction.vin.some(
-        (input: TransactionInputSchema) => input.witness !== undefined
-      );
 
       setAllTransactions((prevTransactions: TransactionSchema[]) => [
         newTransaction,
@@ -151,10 +154,7 @@ function MainCard() {
           </Button>
         </div>
         {allTransactions.map((tx) => (
-          <TransactionForm
-            key={tx.TxId}
-            defaultValues={tx!}
-          />
+          <TransactionForm key={tx.TxId} defaultValues={tx!} />
         ))}
 
         {!validateTransaction && (

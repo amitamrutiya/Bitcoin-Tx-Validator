@@ -6,7 +6,7 @@ import { promisify } from "util";
 const readdir = promisify(fs.readdir);
 const readFile = promisify(fs.readFile);
 
-export async function GET(): Promise<NextResponse | void> {
+export async function POST(): Promise<NextResponse | void> {
   try {
     const files = await readdir("mempool");
     const randomFile = files[Math.floor(Math.random() * files.length)];
