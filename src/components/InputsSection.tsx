@@ -77,7 +77,7 @@ function InputsSection({
                 <FormItem>
                   <FormLabel className="font-bold">Txid</FormLabel>
                   <FormControl>
-                    <Input {...field} type="text" className="w-[400px]" />
+                    <Input {...field} type="text"  />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -129,7 +129,7 @@ function InputsSection({
                 </FormItem>
               )}
             />
-            <div className="flex items-center justify-around my-2">
+            <div className="flex sm:flex-row flex-col sm:items-center sm:justify-around my-2 gap-2">
               <FormField
                 control={form.control}
                 name={`vin.${index}.prevout.value`}

@@ -14,7 +14,7 @@ type TransactionMarkerFlagProps = {
 
 function TransactionMarkerFlag({ form }: TransactionMarkerFlagProps) {
   return (
-    <div className="flex gap-10">
+    <div className="flex gap-5">
       <FormItem>
         <FormLabel className="font-bold">Marker</FormLabel>
         <FormControl>

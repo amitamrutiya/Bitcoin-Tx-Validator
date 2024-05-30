@@ -101,7 +101,7 @@ function MainCard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <div className="flex flex-col gap-10 border p-20 max-w-screen-lg">
+      <div className="flex flex-col gap-10 border md:p-20 sm:p-10 p-5 m-5">
         <div className="flex gap-5">
           <Button
             onClick={() => setValidateTransaction(true)}

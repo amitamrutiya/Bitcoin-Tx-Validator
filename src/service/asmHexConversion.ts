@@ -98,8 +98,7 @@ export function asmToHex(scriptpubkey_asm: string): string {
         throw new Error(`Unsupported opcode: ${part}`);
       }
     } else if (/^[0-9a-fA-F]+$/.test(part)) {
-      const length = (part.length / 2).toString(16).padStart(2, "0");
-      hexString += length + part;
+      hexString += part;
     } else {
       throw new Error(`Invalid script part: ${part}`);
     }

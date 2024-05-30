@@ -62,7 +62,7 @@ export function TransactionForm({
   }, [vin, vout]);
 
   return (
-    <div className="bg-secondary border-b-blue-500 border rounded-lg px-5 py-5 flex flex-col">
+    <div className="bg-secondary border-b-blue-500 border rounded-lg p-5 flex flex-col">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
           <TransactionTypeField setIsSegwit={setIsSegwit} isSegwit={isSegwit} />

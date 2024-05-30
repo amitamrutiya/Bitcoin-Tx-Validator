@@ -67,7 +67,7 @@ function OutputsSection({
               </Button>
             )}
           </div>
-          <div className="flex items-center justify-around my-2">
+          <div className="flex sm:flex-row flex-col sm:items-center sm:justify-around my-2 gap-2">
             <FormField
               control={form.control}
               name={`vout.${index}.value`}
