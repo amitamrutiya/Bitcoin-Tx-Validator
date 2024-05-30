@@ -1,5 +1,33 @@
 import { z } from "zod";
 
+export const outputSchema = z.object({
+  value: z.coerce.number().int().min(1, "Amount must be greater than 0"),
+  scriptpubkey: z.string(),
+  scriptpubkey_address: z.optional(z.string()),
+  scriptpubkey_asm: z.string().min(2, "ScriptPubKey cannot be empty"),
+  scriptpubkey_type: z
+    .enum(
+      [
+        "Non-Standard",
+        "unknown",
+        "p2pk",
+        "p2pkh",
+        "p2ms",
+        "p2sh",
+        "v0_p2wpkh",
+        "v0_p2wsh",
+        "v1_p2tr",
+        "op_return",
+      ],
+      {
+        required_error: "You need to select a type of output",
+      }
+    )
+    .refine((value) => value !== "Non-Standard", {
+      message: "Output type cannot be Non-Standard",
+    }),
+});
+
 export const inputSchema = z.object({
   txid: z
     .string()
@@ -13,64 +41,13 @@ export const inputSchema = z.object({
   scriptsig_asm: z.optional(z.string().min(2, "ScriptSig cannot be empty")),
   sequence: z.coerce.number().int().min(0),
   is_coinbase: z.optional(z.boolean()),
-  prevout: z.object({
-    scriptpubkey_type: z
-      .enum(
-        [
-          "Non-Standard",
-          "p2pk",
-          "p2pkh",
-          "p2ms",
-          "p2sh",
-          "v0_p2wpkh",
-          "p2wpsh",
-          "p2tr",
-        ],
-        {
-          required_error: "You need to select a type of output",
-        }
-      )
-      .refine((value) => value !== "Non-Standard", {
-        message: "Output type cannot be Non-Standard",
-      }),
-    scriptpubkey_asm: z.string().min(2, "ScriptPubKey cannot be empty"),
-    value: z.coerce.number().int().min(1, "Value must be greater than 0"),
-    scriptpubkey: z.optional(z.string()),
-    scriptpubkey_address: z.optional(z.string()),
-  }),
-
+  prevout: outputSchema,
   inner_redeemscript_asm: z.optional(
     z.string().min(2, "RedeemScript cannot be empty")
   ),
-  inner_witness_script_asm: z.optional(
+  inner_witnessscript_asm: z.optional(
     z.string().min(2, "WitnessScript cannot be empty")
   ),
-});
-
-export const outputSchema = z.object({
-  value: z.coerce.number().int().min(1, "Amount must be greater than 0"),
-  scriptpubkey: z.optional(z.string()),
-  scriptpubkey_address: z.optional(z.string()),
-  scriptpubkey_asm: z.string().min(2, "ScriptPubKey cannot be empty"),
-  scriptpubkey_type: z
-    .enum(
-      [
-        "Non-Standard",
-        "p2pk",
-        "p2pkh",
-        "p2ms",
-        "p2sh",
-        "v0_p2wpkh",
-        "p2wpsh",
-        "p2tr",
-      ],
-      {
-        required_error: "You need to select a type of output",
-      }
-    )
-    .refine((value) => value !== "Non-Standard", {
-      message: "Output type cannot be Non-Standard",
-    }),
 });
 
 export const transactionSchema = z.object({
@@ -78,15 +55,23 @@ export const transactionSchema = z.object({
   locktime: z.coerce.number().int().min(0),
   vin: z.array(inputSchema),
   vout: z.array(outputSchema),
+  fee: z.optional(z.number()),
+  weight: z.optional(z.number()),
+  TxId: z.optional(
+    z.string().length(64, "TxId must be exactly 64 characters long")
+  ),
+  wTxId: z.optional(
+    z.string().length(64, "wTxId must be exactly 64 characters long")
+  ),
 });
 
-export type InputSchema = z.infer<typeof inputSchema>;
+export type TransactionInputSchema = z.infer<typeof inputSchema>;
 
-export type OutputSchema = z.infer<typeof outputSchema>;
+export type TransactionOutputSchema = z.infer<typeof outputSchema>;
 
 export type TransactionSchema = z.infer<typeof transactionSchema>;
 
-export const inputDefaultValues: InputSchema = {
+export const inputDefaultValues: TransactionInputSchema = {
   txid: "a".repeat(64),
   vout: 0,
   sequence: 4294967294,
@@ -105,7 +90,7 @@ export const inputDefaultValues: InputSchema = {
   },
 };
 
-export const outputDefaultValues: OutputSchema = {
+export const outputDefaultValues: TransactionOutputSchema = {
   value: 0,
   scriptpubkey_asm: "",
   // @ts-ignore

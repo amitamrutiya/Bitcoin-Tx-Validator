@@ -1,6 +1,6 @@
 "use client";
 
-import { isTransactionValid } from "@/actions/isTransactionValid";
+import { isTransactionValid } from "@/actions/isTransactionValid.1";
 import { mineTransaction } from "@/actions/mineTransaction";
 import { Block, Transaction, TransactionInput } from "@/utils/types";
 import { FormEvent, useState } from "react";

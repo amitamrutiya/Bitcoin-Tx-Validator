@@ -1,7 +1,6 @@
 import { bech32 } from "bech32";
 import bs58 from "bs58";
 import { hash256Buffer } from "./utils";
-import { Transaction } from "../utils/types";
 import { TransactionSchema } from "@/utils/schema";
 
 // Function to generate address based on transaction type

@@ -1,9 +1,9 @@
-import { Transaction } from "../utils/types";
+import { TransactionSchema } from "@/utils/schema";
 import { hash160, sha256 } from "./utils";
 import { isValidSignature } from "./verifySignature";
 
 // Function to execute a script for a transaction
-export function executeScript(transaction: Transaction): boolean {
+export function executeScript(transaction: TransactionSchema): boolean {
   let allValid = true;
   for (let input of transaction.vin) {
     let stack: (string | boolean)[] = [];
@@ -21,12 +21,12 @@ export function executeScript(transaction: Transaction): boolean {
       !input.inner_redeemscript_asm?.split(" ").includes("OP_CSV")
     ) {
       // Pay-to-Script-Hash (P2SH)
-      const scriptsig_asm = input.scriptsig_asm.split(" ");
+      const scriptsig_asm = input.scriptsig_asm!.split(" ");
       const inner_redeemscript = [
         scriptsig_asm[scriptsig_asm.length - 2],
         scriptsig_asm[scriptsig_asm.length - 1],
       ];
-      const scriptSig = input.scriptsig_asm.split(" ");
+      const scriptSig = input.scriptsig_asm!.split(" ");
       scriptSig.splice(-2, 2);
 
       script = [
@@ -62,7 +62,7 @@ export function executeScript(transaction: Transaction): boolean {
     ) {
       // P2SH with multiple witness data
       const signatures = input.witness.slice(1, -1);
-      const scriptsig = input.scriptsig_asm.split(" ")[1];
+      const scriptsig = input.scriptsig_asm!.split(" ")[1];
       stack.push(...signatures);
       script =
         (input.inner_witnessscript_asm ?? "") +

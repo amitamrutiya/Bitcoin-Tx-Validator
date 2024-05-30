@@ -1,11 +1,11 @@
-import { Transaction, TransactionInput } from "../utils/types";
+import { TransactionInputSchema, TransactionSchema } from "@/utils/schema";
 import verifyLegacyTransaction from "./verifyLegacyTransaction";
 import verifySegwitTransaction from "./verifySegwitTransaction";
 
 // Function to check if a signature is valid
 export function isValidSignature(
-  transaction: Transaction,
-  outerInput: TransactionInput,
+  transaction: TransactionSchema,
+  outerInput: TransactionInputSchema,
   signatures: string[],
   publicKeys: string[]
 ): boolean {

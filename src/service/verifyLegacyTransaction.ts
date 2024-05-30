@@ -1,8 +1,8 @@
 import {
-  Transaction,
-  TransactionInput,
-  TransactionOutput,
-} from "../utils/types";
+  TransactionInputSchema,
+  TransactionOutputSchema,
+  TransactionSchema,
+} from "@/utils/schema";
 import {
   serializeUInt32LE,
   serializeUInt64LE,
@@ -12,8 +12,8 @@ import {
 } from "./utils";
 
 export default function verifyLegacyTransaction(
-  transaction: Transaction,
-  input: TransactionInput,
+  transaction: TransactionSchema,
+  input: TransactionInputSchema,
   signatures: string[],
   publicKeys: string[]
 ): boolean {
@@ -41,8 +41,8 @@ export default function verifyLegacyTransaction(
 }
 
 function serializeLegacyTransaction(
-  transaction: Transaction,
-  input: TransactionInput,
+  transaction: TransactionSchema,
+  input: TransactionInputSchema,
   signatures: string[]
 ): Buffer {
   const signatureType = signatures[0].slice(-2);
@@ -87,8 +87,8 @@ function serializeLegacyTransaction(
 
 // Function to serialize inputs
 function serializeInputs(
-  inputs: TransactionInput[],
-  input: TransactionInput,
+  inputs: TransactionInputSchema[],
+  input: TransactionInputSchema,
   anyOneCanPayFlag: boolean
 ): string {
   if (anyOneCanPayFlag) {
@@ -98,14 +98,14 @@ function serializeInputs(
   for (const input of inputs) {
     serialized += Buffer.from(input.txid, "hex").reverse().toString("hex");
     serialized += serializeUInt32LE(input.vout).toString("hex");
-    serialized += serializeVarInt(input.scriptsig.length / 2).toString("hex");
+    serialized += serializeVarInt(input.scriptsig!.length / 2).toString("hex");
     serialized += input.scriptsig;
     serialized += serializeUInt32LE(input.sequence).toString("hex");
   }
   return serialized;
 }
 
-function serializeOutputs(outputs: TransactionOutput[]): string {
+function serializeOutputs(outputs: TransactionOutputSchema[]): string {
   let serialized = serializeVarInt(outputs.length).toString("hex");
   outputs.forEach((output) => {
     serialized += serializeUInt64LE(output.value).toString("hex");

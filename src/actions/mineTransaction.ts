@@ -1,7 +1,7 @@
 "use server";
 
 import { Block, Transaction } from "@/utils/types";
-import { isTransactionValid } from "./isTransactionValid";
+import { isTransactionValid } from "./isTransactionValid.1";
 import { createBlockHeader } from "@/service/createBlockHeader";
 import { createCoinbaseTransaction } from "@/service/createCoinbaseTransaction";
 import { selectTransaction } from "@/service/selectTransaction";

@@ -16,7 +16,7 @@ import InputsSection from "./InputsSection";
 import OutputsSection from "./OutputSection";
 import LocktimeField from "./LocktimeField";
 import TransactionMarkerFlag from "./TransactionMarkerFlag";
-import { isTransactionValid } from "@/actions/isTransactionValid";
+import { isTransactionValid } from "@/actions/isTransactionValid.1";
 
 type TransactionFormProps = {
   defaultValues: TransactionSchema | null;

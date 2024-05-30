@@ -1,8 +1,8 @@
-import { Transaction } from "../utils/types";
+import { TransactionSchema } from "@/utils/schema";
 import { toLittleEndian, serializeVarInt } from "./utils";
 
 // Function to serialize a transaction
-export function serializeTransaction(tx: Transaction): string {
+export function serializeTransaction(tx: TransactionSchema): string {
   // Convert version and locktime to little endian format
   let version = toLittleEndian(tx.version.toString(16).padStart(8, "0"));
   let locktime = toLittleEndian(tx.locktime.toString(16).padStart(8, "0"));

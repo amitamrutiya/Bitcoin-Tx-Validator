@@ -1,4 +1,4 @@
-import { Transaction } from "@/utils/types";
+import { TransactionSchema } from "@/utils/schema";
 import { createMerkleRoot, toLittleEndian, hash256 } from "./utils";
 
 // Converts the target difficulty into bits for the block header
@@ -34,7 +34,7 @@ function field(data: number, size: number): string {
 }
 
 // Creates a new block header for a set of transactions
-export function createBlockHeader(transactions: Transaction[]): string {
+export function createBlockHeader(transactions: TransactionSchema[]): string {
   // Define the target difficulty for the block
   const target =
     "0000ffff00000000000000000000000000000000000000000000000000000000";
