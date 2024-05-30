@@ -43,7 +43,7 @@ export function TransactionForm({ defaultValues }: TransactionFormProps) {
 
   useEffect(() => {
     if (defaultValues) {
-      setIsSegwit(defaultValues.vin.some((tx) => tx.witness !== undefined));
+      setIsSegwit(defaultValues.vin.some((tx) => tx.witness !== undefined))
     }
   }, [defaultValues]);
 
