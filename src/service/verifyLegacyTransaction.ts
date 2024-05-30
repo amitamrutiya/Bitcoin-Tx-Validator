@@ -109,7 +109,7 @@ function serializeOutputs(outputs: TransactionOutputSchema[]): string {
   let serialized = serializeVarInt(outputs.length).toString("hex");
   outputs.forEach((output) => {
     serialized += serializeUInt64LE(output.value).toString("hex");
-    serialized += serializeVarInt(output.scriptpubkey.length / 2).toString(
+    serialized += serializeVarInt(output.scriptpubkey!.length / 2).toString(
       "hex"
     );
     serialized += output.scriptpubkey;

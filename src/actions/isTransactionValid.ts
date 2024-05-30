@@ -1,5 +1,6 @@
 "use server";
 
+import { asmToHex } from "@/service/asmHexConversion";
 import { executeScript } from "@/service/scriptExecution";
 import { serializeTransaction } from "@/service/serializeTransaction";
 import { serializeWitnessTransaction } from "@/service/serializeWitnessTransaction";
@@ -12,6 +13,14 @@ export async function isTransactionValid(
 ): Promise<boolean> {
   let fee = 0;
   if (!transaction) return false;
+
+  transaction.vin.forEach((input) => {
+    input.prevout.scriptpubkey = asmToHex(input.prevout.scriptpubkey_asm);
+  });
+
+  transaction.vout.forEach((output) => {
+    output.scriptpubkey = asmToHex(output.scriptpubkey_asm);
+  });
 
   const isValidAddress = isValidAddresses(transaction);
   if (!isValidAddress) {

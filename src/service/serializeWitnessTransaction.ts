@@ -50,7 +50,7 @@ export function serializeWitnessTransaction(tx: TransactionSchema): string {
     .map((output) => {
       let value = toLittleEndian(output.value.toString(16).padStart(16, "0"));
       let scriptPubKey =
-        serializeVarInt(output.scriptpubkey.length / 2).toString("hex") +
+        serializeVarInt(output.scriptpubkey!.length / 2).toString("hex") +
         output.scriptpubkey;
       return value + scriptPubKey;
     })

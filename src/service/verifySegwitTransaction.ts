@@ -156,15 +156,15 @@ function hashOutputs(
     const output = transaction.vout[inputIndex];
     const value = serializeUInt64LE(output.value);
     const scriptPubKeySize = Buffer.alloc(1);
-    scriptPubKeySize.writeUInt8(output.scriptpubkey.length / 2);
-    const scriptPubKey = Buffer.from(output.scriptpubkey, "hex");
+    scriptPubKeySize.writeUInt8(output.scriptpubkey!.length / 2);
+    const scriptPubKey = Buffer.from(output.scriptpubkey!, "hex");
     outputs = [Buffer.concat([value, scriptPubKeySize, scriptPubKey])];
   } else if (sighashType !== "SINGLE" && sighashType !== "NONE") {
     outputs = transaction.vout.map((output) => {
       const value = serializeUInt64LE(output.value);
       const scriptPubKeySize = Buffer.alloc(1);
-      scriptPubKeySize.writeUInt8(output.scriptpubkey.length / 2);
-      const scriptPubKey = Buffer.from(output.scriptpubkey, "hex");
+      scriptPubKeySize.writeUInt8(output.scriptpubkey!.length / 2);
+      const scriptPubKey = Buffer.from(output.scriptpubkey!, "hex");
       return Buffer.concat([value, scriptPubKeySize, scriptPubKey]);
     });
   } else {
