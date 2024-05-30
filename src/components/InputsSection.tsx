@@ -156,26 +156,26 @@ function InputsSection({
                           <DropdownMenuRadioItem value="Non-Standard">
                             Non-Standard
                           </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="P2PK">
-                            P2PK
+                          <DropdownMenuRadioItem value="p2pk">
+                            p2pk
                           </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="P2PKH">
-                            P2PKH
+                          <DropdownMenuRadioItem value="p2pkh">
+                            p2pkh
                           </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="P2MS">
-                            P2MS
+                          <DropdownMenuRadioItem value="p2ms">
+                            p2ms
                           </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="P2SH">
-                            P2SH
+                          <DropdownMenuRadioItem value="p2sh">
+                            p2sh
                           </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="P2WPKH">
-                            P2WPKH
+                          <DropdownMenuRadioItem value="v0_p2wpkh">
+                            v0_p2wpkh
                           </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="P2WPSH">
-                            P2WPSH
+                          <DropdownMenuRadioItem value="p2wpsh">
+                            p2wpsh
                           </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="P2TR">
-                            P2TR
+                          <DropdownMenuRadioItem value="p2tr">
+                            p2tr
                           </DropdownMenuRadioItem>
                         </DropdownMenuRadioGroup>
                       </DropdownMenuContent>

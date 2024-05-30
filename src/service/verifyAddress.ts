@@ -2,6 +2,7 @@ import { bech32 } from "bech32";
 import bs58 from "bs58";
 import { hash256Buffer } from "./utils";
 import { Transaction } from "../utils/types";
+import { TransactionSchema } from "@/utils/schema";
 
 // Function to generate address based on transaction type
 function generateAddress(
@@ -76,7 +77,7 @@ function extractPkh(scriptpubkey_asm: string): string | null {
 }
 
 // Function to validate addresses in a transaction
-export function isValidAddresses(transaction: Transaction): boolean {
+export function isValidAddresses(transaction: TransactionSchema): boolean {
   let isValid = true;
 
   // Validate input address

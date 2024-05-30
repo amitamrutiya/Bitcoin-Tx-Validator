@@ -16,26 +16,33 @@ import InputsSection from "./InputsSection";
 import OutputsSection from "./OutputSection";
 import LocktimeField from "./LocktimeField";
 import TransactionMarkerFlag from "./TransactionMarkerFlag";
+import { isTransactionValid } from "@/actions/isTransactionValid";
+
+type TransactionFormProps = {
+  defaultValues: TransactionSchema | null;
+  isSegwit: boolean;
+  setIsSegwit: (value: boolean) => void;
+};
 
 export function TransactionForm({
   defaultValues,
-}: {
-  defaultValues: TransactionSchema | null;
-}) {
-  console.log(defaultValues);
+  isSegwit,
+  setIsSegwit,
+}: TransactionFormProps) {
   const form: UseFormReturn<TransactionSchema> = useForm<TransactionSchema>({
     mode: "all",
     resolver: zodResolver(transactionSchema),
     defaultValues: defaultValues ?? TransactionDefaultValues,
   });
 
-  function onSubmit(values: TransactionSchema) {
+  async function onSubmit(values: TransactionSchema) {
+    const isValid = await isTransactionValid(values);
     console.log(values);
+    console.log("Transaction is valid: ", isValid);
   }
 
   const [inputsNumber, setInputsNumber] = useState([0]);
   const [outputsNumber, setOutputsNumber] = useState([0]);
-  const [isSegwit, setIsSegwit] = useState<boolean>(false);
 
   const vin = useWatch({ control: form.control, name: "vin" });
   const vout = useWatch({ control: form.control, name: "vout" });
@@ -57,7 +64,7 @@ export function TransactionForm({
     <div className="bg-secondary border-b-blue-500 border rounded-lg px-5 py-5 flex flex-col">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-          <TransactionTypeField setIsSegwit={setIsSegwit} />
+          <TransactionTypeField setIsSegwit={setIsSegwit} isSegwit={isSegwit} />
           <TransactionVersionField form={form} />
           {isSegwit && <TransactionMarkerFlag form={form} />}
           <InputsSection

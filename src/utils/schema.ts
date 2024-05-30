@@ -7,10 +7,10 @@ export const inputSchema = z.object({
     .refine((value) => /^[0-9a-fA-F]+$/.test(value), {
       message: "Txid must be a valid hexadecimal string.",
     }),
-  vout: z.coerce.number().int().min(1, "Vout must be greater than 0"),
+  vout: z.coerce.number().int().min(0, "Vout must be greater than 0"),
   witness: z.optional(z.array(z.string().min(2, "witness cannot be empty"))),
   scriptsig: z.optional(z.string()),
-  scriptsig_asm: z.string().min(2, "ScriptSig cannot be empty"),
+  scriptsig_asm: z.optional(z.string().min(2, "ScriptSig cannot be empty")),
   sequence: z.coerce.number().int().min(0),
   is_coinbase: z.optional(z.boolean()),
   prevout: z.object({
@@ -22,7 +22,7 @@ export const inputSchema = z.object({
           "p2pkh",
           "p2ms",
           "p2sh",
-          "p2wpkh",
+          "v0_p2wpkh",
           "p2wpsh",
           "p2tr",
         ],
@@ -60,7 +60,7 @@ export const outputSchema = z.object({
         "p2pkh",
         "p2ms",
         "p2sh",
-        "p2wpkh",
+        "v0_p2wpkh",
         "p2wpsh",
         "p2tr",
       ],
@@ -113,8 +113,6 @@ export const outputDefaultValues: OutputSchema = {
   scriptpubkey: "",
   scriptpubkey_address: "",
 };
-
-
 
 export const TransactionDefaultValues: TransactionSchema = {
   version: 1,

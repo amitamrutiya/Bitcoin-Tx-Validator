@@ -5,10 +5,11 @@ import { serializeTransaction } from "@/service/serializeTransaction";
 import { serializeWitnessTransaction } from "@/service/serializeWitnessTransaction";
 import { calculateTxId } from "@/service/utils";
 import { isValidAddresses } from "@/service/verifyAddress";
+import { TransactionSchema } from "@/utils/schema";
 import { Transaction } from "@/utils/types";
 
 export async function isTransactionValid(
-  transaction: Transaction
+  transaction: TransactionSchema
 ): Promise<boolean> {
   let fee = 0;
   if (!transaction) return false;

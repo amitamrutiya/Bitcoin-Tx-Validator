@@ -2,7 +2,7 @@
 
 import { isTransactionValid } from "@/actions/isTransactionValid";
 import { mineTransaction } from "@/actions/mineTransaction";
-import { Block, Transaction } from "@/utils/types";
+import { Block, Transaction, TransactionInput } from "@/utils/types";
 import { FormEvent, useState } from "react";
 import {
   AlertDialog,
@@ -23,6 +23,7 @@ function MainCard() {
   const [open, setOpen] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const [minedBlock, setMinedBlock] = useState<Block>();
+  const [isSegwit, setIsSegwit] = useState<boolean>(false);
 
   async function getRandomTransaction(): Promise<void> {
     let transactionNumber = 1;
@@ -35,6 +36,10 @@ function MainCard() {
     for (let i = 0; i < transactionNumber; i++) {
       const response = await fetch("/api/randomTransaction");
       const newTransaction = await response.json();
+      const isSegwit = newTransaction.vin.some(
+        (input: TransactionInput) => input.witness !== undefined
+      );
+      setIsSegwit(isSegwit);
       setTransaction(newTransaction);
     }
   }
@@ -137,7 +142,11 @@ function MainCard() {
             Random Example
           </Button>
         </div>
-        <TransactionForm defaultValues={transaction!} />
+        <TransactionForm
+          defaultValues={transaction!}
+          isSegwit={isSegwit}
+          setIsSegwit={setIsSegwit}
+        />
       </div>
     </>
   );
