@@ -1,4 +1,4 @@
-import { Transaction, TransactionInput } from "../types";
+import { TransactionInputSchema, TransactionSchema } from "@/utils/schema";
 import {
   hash256Buffer,
   serializeUInt32LE,
@@ -8,8 +8,8 @@ import {
 } from "./utils";
 
 export default function verifySegwitTransaction(
-  transaction: Transaction,
-  input: TransactionInput,
+  transaction: TransactionSchema,
+  input: TransactionInputSchema,
   signatures: string[],
   publicKeys: string[]
 ): boolean {
@@ -37,8 +37,8 @@ export default function verifySegwitTransaction(
 }
 
 function serializeSegwitTransaction(
-  transaction: Transaction,
-  input: TransactionInput
+  transaction: TransactionSchema,
+  input: TransactionInputSchema
 ): Buffer {
   const inputIndex = transaction.vin.findIndex(
     (vin) => vin.txid === input.txid
@@ -89,13 +89,13 @@ function serializeSegwitTransaction(
   ]);
 }
 
-function serializeOutpoint(input: TransactionInput): Buffer {
+function serializeOutpoint(input: TransactionInputSchema): Buffer {
   const txid = Buffer.from(input.txid, "hex").reverse();
   const vout = serializeUInt32LE(input.vout);
   return Buffer.concat([txid, vout]);
 }
 
-function serializeScriptCode(input: TransactionInput): Buffer {
+function serializeScriptCode(input: TransactionInputSchema): Buffer {
   if (
     input.prevout.scriptpubkey_type === "p2sh" &&
     input.witness !== undefined &&
@@ -110,7 +110,7 @@ function serializeScriptCode(input: TransactionInput): Buffer {
       Buffer.from(scriptPubKey, "hex"),
     ]);
   }
-  const scriptPubKey = input.scriptsig.slice(4);
+  const scriptPubKey = input.scriptsig!.slice(4);
   return Buffer.concat([
     Buffer.from("1976a914", "hex"),
     Buffer.from(scriptPubKey, "hex"),
@@ -131,8 +131,8 @@ function hashPrevouts(transaction: any, anyOneCanPayFlag: boolean): Buffer {
 }
 
 function hashSequence(
-  transaction: Transaction,
-  input: TransactionInput,
+  transaction: TransactionSchema,
+  input: TransactionInputSchema,
   anyOneCanPayFlag: boolean
 ): Buffer {
   if (anyOneCanPayFlag) {
@@ -146,7 +146,7 @@ function hashSequence(
 }
 
 function hashOutputs(
-  transaction: Transaction,
+  transaction: TransactionSchema,
   sighashType: string,
   inputIndex: number,
   anyOneCanPayFlag: boolean
@@ -156,15 +156,15 @@ function hashOutputs(
     const output = transaction.vout[inputIndex];
     const value = serializeUInt64LE(output.value);
     const scriptPubKeySize = Buffer.alloc(1);
-    scriptPubKeySize.writeUInt8(output.scriptpubkey.length / 2);
-    const scriptPubKey = Buffer.from(output.scriptpubkey, "hex");
+    scriptPubKeySize.writeUInt8(output.scriptpubkey!.length / 2);
+    const scriptPubKey = Buffer.from(output.scriptpubkey!, "hex");
     outputs = [Buffer.concat([value, scriptPubKeySize, scriptPubKey])];
   } else if (sighashType !== "SINGLE" && sighashType !== "NONE") {
     outputs = transaction.vout.map((output) => {
       const value = serializeUInt64LE(output.value);
       const scriptPubKeySize = Buffer.alloc(1);
-      scriptPubKeySize.writeUInt8(output.scriptpubkey.length / 2);
-      const scriptPubKey = Buffer.from(output.scriptpubkey, "hex");
+      scriptPubKeySize.writeUInt8(output.scriptpubkey!.length / 2);
+      const scriptPubKey = Buffer.from(output.scriptpubkey!, "hex");
       return Buffer.concat([value, scriptPubKeySize, scriptPubKey]);
     });
   } else {

@@ -1,8 +1,8 @@
-import { Transaction } from "../types";
+import { TransactionSchema } from "@/utils/schema";
 import { toLittleEndian, serializeVarInt } from "./utils";
 
 // Function to serialize a witness transaction
-export function serializeWitnessTransaction(tx: Transaction): string {
+export function serializeWitnessTransaction(tx: TransactionSchema): string {
   // Convert version to little endian format
   let version = toLittleEndian(tx.version.toString(16).padStart(8, "0"));
 
@@ -50,7 +50,7 @@ export function serializeWitnessTransaction(tx: Transaction): string {
     .map((output) => {
       let value = toLittleEndian(output.value.toString(16).padStart(16, "0"));
       let scriptPubKey =
-        serializeVarInt(output.scriptpubkey.length / 2).toString("hex") +
+        serializeVarInt(output.scriptpubkey!.length / 2).toString("hex") +
         output.scriptpubkey;
       return value + scriptPubKey;
     })

@@ -1,8 +1,8 @@
-import { Transaction } from "../types";
+import { TransactionSchema } from "@/utils/schema";
 import { toLittleEndian, serializeVarInt } from "./utils";
 
 // Function to serialize a transaction
-export function serializeTransaction(tx: Transaction): string {
+export function serializeTransaction(tx: TransactionSchema): string {
   // Convert version and locktime to little endian format
   let version = toLittleEndian(tx.version.toString(16).padStart(8, "0"));
   let locktime = toLittleEndian(tx.locktime.toString(16).padStart(8, "0"));
@@ -38,7 +38,7 @@ export function serializeTransaction(tx: Transaction): string {
     .map((output) => {
       let value = toLittleEndian(output.value.toString(16).padStart(16, "0"));
       let scriptPubKey =
-        serializeVarInt(output.scriptpubkey.length / 2).toString("hex") +
+        serializeVarInt(output.scriptpubkey!.length / 2).toString("hex") +
         output.scriptpubkey;
       // Return the serialized output
       return value + scriptPubKey;

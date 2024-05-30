@@ -1,9 +1,7 @@
 "use client";
 
-import { isTransactionValid } from "@/actions/isTransactionValid";
-import { mineTransaction } from "@/actions/mineTransaction";
-import { Block, Transaction } from "@/types";
-import { FormEvent, useState } from "react";
+import { Block } from "@/utils/types";
+import { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,39 +11,31 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { JsonViewer } from "@textea/json-viewer";
 import { Button } from "@/components/ui/button";
+import {
+  TransactionDefaultValues,
+  TransactionInputSchema,
+  TransactionSchema,
+} from "@/utils/schema";
+import { TransactionForm } from "./TransactionForm";
+import { mineTransaction } from "@/actions/mineTransaction";
 
-function MainCard({ dummyTransaction }: { dummyTransaction: Transaction }) {
+function MainCard() {
   const [validateTransaction, setValidateTransaction] = useState(true);
-  const [transactions, setTransactions] = useState<Transaction[]>([
-    dummyTransaction,
-  ]);
   const [open, setOpen] = useState(false);
-  const [isValid, setIsValid] = useState(false);
   const [minedBlock, setMinedBlock] = useState<Block>();
+  const [allTransactions, setAllTransactions] = useState<TransactionSchema[]>([
+    TransactionDefaultValues,
+  ]);
 
-  async function handleFormSubmit(
-    event: FormEvent<HTMLFormElement>
-  ): Promise<void> {
-    event.preventDefault();
-    if (validateTransaction) {
-      console.log("Validating your transaction");
-      const isValid = await isTransactionValid(transactions[0]);
-      setOpen(true);
-      setIsValid(isValid);
-      console.log(isValid);
-    } else {
-      console.log("Miningin your transactions");
-      const minedBlock = await mineTransaction(transactions);
-      setOpen(true);
-      setMinedBlock(minedBlock);
-      console.log(minedBlock);
-    }
+  function handleAddTransaction() {
+    setAllTransactions((prevTransactions: TransactionSchema[]) => [
+      TransactionDefaultValues,
+      ...prevTransactions,
+    ]);
   }
 
   async function getRandomTransaction(): Promise<void> {
-    setTransactions([]);
     let transactionNumber = 1;
 
     if (!validateTransaction) {
@@ -56,11 +46,28 @@ function MainCard({ dummyTransaction }: { dummyTransaction: Transaction }) {
     for (let i = 0; i < transactionNumber; i++) {
       const response = await fetch("/api/randomTransaction");
       const newTransaction = await response.json();
-      setTransactions((prevTransactions: Transaction[]) => [
+      if (validateTransaction) setAllTransactions([]);
+      const isSegwit = newTransaction.vin.some(
+        (input: TransactionInputSchema) => input.witness !== undefined
+      );
+
+      setAllTransactions((prevTransactions: TransactionSchema[]) => [
         newTransaction,
         ...prevTransactions,
       ]);
     }
+  }
+
+  async function handleMineBlock(): Promise<void> {
+    try {
+      const minedBlock = await mineTransaction(allTransactions);
+      setMinedBlock(minedBlock);
+    } catch (error) {
+      setMinedBlock(undefined);
+    } finally {
+      setOpen(true);
+    }
+    setOpen(true);
   }
 
   return (
@@ -69,17 +76,7 @@ function MainCard({ dummyTransaction }: { dummyTransaction: Transaction }) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {validateTransaction ? (
-                isValid ? (
-                  <span className="text-bold text-3xl">
-                    Transaction is Valid
-                  </span>
-                ) : (
-                  <span className="text-bold text-3xl">
-                    Transaction is not Valid
-                  </span>
-                )
-              ) : minedBlock ? (
+              {minedBlock ? (
                 <span className="text-bold text-3xl">
                   Block Mined Successfully
                 </span>
@@ -88,15 +85,7 @@ function MainCard({ dummyTransaction }: { dummyTransaction: Transaction }) {
               )}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {validateTransaction ? (
-                isValid ? (
-                  <span className="text-lg">
-                    Your transaction is valid and ready to be mined
-                  </span>
-                ) : (
-                  <span className="text-lg">Your transaction is not valid</span>
-                )
-              ) : minedBlock ? (
+              {minedBlock ? (
                 <div>
                   <span className="text-lg">Your Mined Block is Here</span>
                   <textarea
@@ -119,7 +108,7 @@ function MainCard({ dummyTransaction }: { dummyTransaction: Transaction }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <div className="flex flex-col gap-10 border p-20 max-w-screen-lg">
+      <div className="flex flex-col gap-5 border md:p-20 sm:p-10 p-5 m-5">
         <div className="flex gap-5">
           <Button
             onClick={() => setValidateTransaction(true)}
@@ -161,43 +150,28 @@ function MainCard({ dummyTransaction }: { dummyTransaction: Transaction }) {
             Random Example
           </Button>
         </div>
-        <form onSubmit={handleFormSubmit}>
-          <div className="mt-1">
-            <JsonViewer
-              value={transactions}
-              editable
-              theme={"dark"}
-              enableDelete
-              displayDataTypes={false}
-              enableClipboard
-              defaultInspectDepth={3}
-              className="p-4 bg-transparent text-lg"
-              onChange={(path, oldValue, newValue) => {
-                setTransactions((prevTransactions) => {
-                  const newTransactions = [...prevTransactions];
+        {allTransactions.map((tx) => (
+          <TransactionForm
+            key={tx.TxId}
+            defaultValues={tx!}
+          />
+        ))}
 
-                  const updateValue = (obj: any[], path: any, value: any) => {
-                    if (path.length === 1) {
-                      obj[path[0]] = value;
-                    } else {
-                      updateValue(obj[path[0]], path.slice(1), value);
-                    }
-                  };
-
-                  updateValue(newTransactions, path, newValue);
-
-                  return newTransactions;
-                });
-              }}
-            />
-          </div>
+        {!validateTransaction && (
           <Button
-            type="submit"
-            className="mt-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-secondary bg-primary transform transition duration-300 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            type="button"
+            variant="secondary"
+            onClick={handleAddTransaction}
           >
-            Submit
+            Add Transaction
           </Button>
-        </form>
+        )}
+
+        {!validateTransaction && (
+          <Button type="button" variant="secondary" onClick={handleMineBlock}>
+            Mine Block
+          </Button>
+        )}
       </div>
     </>
   );

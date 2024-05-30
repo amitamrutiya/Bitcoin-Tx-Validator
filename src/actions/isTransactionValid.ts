@@ -1,24 +1,36 @@
 "use server";
 
+import { asmToHex } from "@/service/asmHexConversion";
 import { executeScript } from "@/service/scriptExecution";
 import { serializeTransaction } from "@/service/serializeTransaction";
 import { serializeWitnessTransaction } from "@/service/serializeWitnessTransaction";
 import { calculateTxId } from "@/service/utils";
 import { isValidAddresses } from "@/service/verifyAddress";
-import { Transaction } from "@/types";
+import { TransactionSchema } from "@/utils/schema";
 
 export async function isTransactionValid(
-  transaction: Transaction
-): Promise<boolean> {
+  transaction: TransactionSchema
+): Promise<{ isValid: boolean; seralizedTransaction: string }> {
   let fee = 0;
-  if (!transaction) return false;
+  if (!transaction) return { isValid: false, seralizedTransaction: "" };
+  let isSegwit = false;
+
+  isSegwit = transaction.vin.some((tx) => tx.witness !== undefined);
+
+  transaction.vin.forEach((input) => {
+    input.prevout.scriptpubkey = asmToHex(input.prevout.scriptpubkey_asm);
+  });
+
+  transaction.vout.forEach((output) => {
+    output.scriptpubkey = asmToHex(output.scriptpubkey_asm);
+  });
 
   const isValidAddress = isValidAddresses(transaction);
   if (!isValidAddress) {
     console.log("Invalid Address");
-    return false;
+    return { isValid: false, seralizedTransaction: "" };
   }
-
+  console.log("Valid Address");
   // Transaction ID Validation
   const serializedTransaction = serializeTransaction(transaction);
   const TxId = calculateTxId(serializedTransaction);
@@ -31,7 +43,8 @@ export async function isTransactionValid(
   // Script and Signature Validation
   const result = executeScript(transaction);
   if (!result) {
-    return false;
+    console.log("Script and Signature Validation failed");
+    return { isValid: false, seralizedTransaction: "" };
   }
 
   // Output Validation
@@ -45,10 +58,15 @@ export async function isTransactionValid(
   );
   if (outputTotal > inputTotal) {
     console.log("Output total exceeds input total");
-    return false; // Output total exceeds input total
+    return { isValid: false, seralizedTransaction: "" };
   }
   fee = inputTotal - outputTotal;
   transaction.fee = fee;
 
-  return true;
+  return {
+    isValid: true,
+    seralizedTransaction: isSegwit
+      ? serializedWitnessTransaction
+      : serializedTransaction,
+  };
 }

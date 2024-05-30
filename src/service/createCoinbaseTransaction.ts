@@ -1,11 +1,11 @@
-import { Transaction } from "../types";
+import { TransactionSchema } from "@/utils/schema";
 import { createMerkleRoot, hash256 } from "./utils";
 
 // Function to create a coinbase transaction
 export function createCoinbaseTransaction(
   amount: number,
-  transactions: Transaction[]
-): Transaction {
+  transactions: TransactionSchema[]
+): TransactionSchema {
   // Create a 32-byte buffer and convert it to a hexadecimal string
   const witnessReservedValue = Buffer.alloc(32).toString("hex");
 
@@ -25,7 +25,7 @@ export function createCoinbaseTransaction(
   const scriptPubKeyForWitnessCommitment = `6a24aa21a9ed${witnessCommitment}`;
 
   // Define the structure of the coinbase transaction
-  const coinbaseTransaction: Transaction = {
+  const coinbaseTransaction: TransactionSchema = {
     version: 1,
     locktime: 0,
     fee: 0,
@@ -49,7 +49,7 @@ export function createCoinbaseTransaction(
           scriptpubkey: "",
           scriptpubkey_address: "",
           scriptpubkey_asm: "",
-          scriptpubkey_type: "",
+          scriptpubkey_type: "p2sh",
           value: 0,
         },
         scriptsig_asm: "",
@@ -61,14 +61,14 @@ export function createCoinbaseTransaction(
         scriptpubkey: "76a914edf10a7fac6b32e24daa5305c723f3de58db1bc888ac",
         scriptpubkey_address: "",
         scriptpubkey_asm: "",
-        scriptpubkey_type: "",
+        scriptpubkey_type: "p2pk",
       },
       {
         value: 0,
         scriptpubkey: scriptPubKeyForWitnessCommitment,
         scriptpubkey_address: "",
         scriptpubkey_asm: "",
-        scriptpubkey_type: "",
+        scriptpubkey_type: "p2pk",
       },
     ],
   };
