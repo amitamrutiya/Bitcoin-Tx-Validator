@@ -12,15 +12,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  TransactionDefaultValues,
-  TransactionInputSchema,
-  TransactionSchema,
-} from "@/utils/schema";
+import { TransactionDefaultValues, TransactionSchema } from "@/utils/schema";
 import { TransactionForm } from "./TransactionForm";
 import { mineTransaction } from "@/actions/mineTransaction";
+import { useRouter } from "next/navigation";
 
 function MainCard() {
+  const router = useRouter();
   const [validateTransaction, setValidateTransaction] = useState(true);
   const [open, setOpen] = useState(false);
   const [minedBlock, setMinedBlock] = useState<Block>();
@@ -111,24 +109,27 @@ function MainCard() {
       <div className="flex flex-col gap-5 border md:p-20 sm:p-10 p-5 m-5">
         <div className="flex gap-5">
           <Button
+            variant={validateTransaction ? "default" : "secondary"}
             onClick={() => setValidateTransaction(true)}
-            className={`${
-              validateTransaction
-                ? "bg-primary text-secondary"
-                : "bg-secondary text-primary"
-            } p-3 rounded-lg transform transition duration-300 ease-in-out hover:scale-110`}
+            className={`p-3 rounded-lg transform transition duration-300 ease-in-out hover:scale-110 `}
           >
             Validate Transaction
           </Button>
           <Button
             onClick={() => setValidateTransaction(false)}
-            className={`${
-              !validateTransaction
-                ? "bg-primary text-secondary"
-                : "bg-secondary text-primary"
-            } p-3 rounded-lg transform transition duration-300 ease-in-out hover:scale-110`}
+            variant={validateTransaction ? "secondary" : "default"}
+            className={` p-3 rounded-lg transform transition duration-300 ease-in-out hover:scale-110`}
           >
             Mine Transaction
+          </Button>
+          <Button
+            onClick={() => router.push("/other-features")}
+            className={
+              "p-3 rounded-lg transform transition duration-300 ease-in-out hover:scale-110"
+            }
+            variant="secondary"
+          >
+            Other Features
           </Button>
         </div>
         {validateTransaction ? (
@@ -144,14 +145,18 @@ function MainCard() {
           Enter your Bitcoin transaction
           <Button
             type="submit"
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-secondary bg-primary transform transition duration-300 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md hover:text-primary-foregound bg-primary transform transition duration-300 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             onClick={getRandomTransaction}
           >
             Random Example
           </Button>
         </div>
         {allTransactions.map((tx) => (
-          <TransactionForm key={tx.TxId} defaultValues={tx!} />
+          <TransactionForm
+            key={tx.TxId}
+            defaultValues={tx!}
+            checkValid={true}
+          />
         ))}
 
         {!validateTransaction && (
