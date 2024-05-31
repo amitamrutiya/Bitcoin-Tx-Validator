@@ -29,9 +29,13 @@ import {
 
 type TransactionFormProps = {
   defaultValues: TransactionSchema | null;
+  checkValid: boolean;
 };
 
-export function TransactionForm({ defaultValues }: TransactionFormProps) {
+export function TransactionForm({
+  defaultValues,
+  checkValid,
+}: TransactionFormProps) {
   const form: UseFormReturn<TransactionSchema> = useForm<TransactionSchema>({
     mode: "all",
     resolver: zodResolver(transactionSchema),
@@ -43,7 +47,7 @@ export function TransactionForm({ defaultValues }: TransactionFormProps) {
 
   useEffect(() => {
     if (defaultValues) {
-      setIsSegwit(defaultValues.vin.some((tx) => tx.witness !== undefined))
+      setIsSegwit(defaultValues.vin.some((tx) => tx.witness !== undefined));
     }
   }, [defaultValues]);
 
@@ -56,7 +60,7 @@ export function TransactionForm({ defaultValues }: TransactionFormProps) {
       console.log(error);
       setIsValid(false);
     } finally {
-      setOpen(true);
+      if (checkValid) setOpen(true);
     }
   }
 
