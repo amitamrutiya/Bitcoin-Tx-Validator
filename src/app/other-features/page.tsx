@@ -38,7 +38,13 @@ function OtherFeature() {
         <AccordionItem value="item-3">
           <AccordionTrigger>TXID</AccordionTrigger>
           <AccordionContent>
-            <TxidForm />
+            <TxidForm type={"txid"}/>
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-4">
+          <AccordionTrigger>wTXID</AccordionTrigger>
+          <AccordionContent>
+            <TxidForm type={"wtxid"} />
           </AccordionContent>
         </AccordionItem>
       </Accordion>

@@ -1,4 +1,4 @@
-import getTxid from "@/actions/getTxid";
+import { getTxid } from "@/actions/getTxid";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { UseFormReturn, useForm } from "react-hook-form";
 
-function TxidForm() {
+function TxidForm({ type }: { type: string }) {
   const [txid, setTxid] = useState<string>("");
 
   const form: UseFormReturn<TxidSchema> = useForm<TxidSchema>({
@@ -33,7 +33,9 @@ function TxidForm() {
   }
   return (
     <div className="bg-secondary border-b-blue-500 border rounded-lg p-4 flex flex-col">
-      <p className="text-md">Create a TXID from raw transaction data.</p>
+      <p className="text-md">
+        Create a {type === "txid" ? "txid" : "wtxid"} from raw transaction data.
+      </p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
           <FormField
@@ -52,7 +54,12 @@ function TxidForm() {
           <Button type="submit">Calculate</Button>
         </form>
       </Form>
-      <Label className="font-bold my-2">TXID (Natural Byte Order)</Label>
+
+      <Label className="font-bold my-2">
+        {type === "txid"
+          ? "TXID (Natural Byte Order)"
+          : "WTXID(Natural Byte Order)"}
+      </Label>
       <Input type="text" placeholder="Root" value={txid} />
     </div>
   );
