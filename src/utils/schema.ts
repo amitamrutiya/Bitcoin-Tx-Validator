@@ -67,8 +67,20 @@ export const transactionSchema = z.object({
 
 export const merkleRootSchema = z.object({
   txids: z.array(
-    z.string().length(64, "Txid must be exactly 64 characters long")
+    z
+      .string()
+      .length(64, "Txid must be exactly 64 characters long")
+      .refine(
+        (txid) => /^[a-fA-F0-9]+$/.test(txid),
+        "Txid must only contain hexadecimal characters"
+      )
   ),
+});
+
+export const txidSchema = z.object({
+  rawTransaction: z.string().min(50, {
+    message: "transaction data must be at least 50 characters.",
+  }),
 });
 
 export type TransactionInputSchema = z.infer<typeof inputSchema>;
@@ -78,6 +90,8 @@ export type TransactionOutputSchema = z.infer<typeof outputSchema>;
 export type TransactionSchema = z.infer<typeof transactionSchema>;
 
 export type MerkleRootSchema = z.infer<typeof merkleRootSchema>;
+
+export type TxidSchema = z.infer<typeof txidSchema>;
 
 export const inputDefaultValues: TransactionInputSchema = {
   txid: "a".repeat(64),
