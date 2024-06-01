@@ -10,6 +10,7 @@ import {
 import { TransactionForm } from "@/components/TransactionForm";
 import { TransactionDefaultValues } from "@/utils/schema";
 import MerkelRootForm from "./_components/MerkelRootForm";
+import TxidForm from "./_components/TxidForm";
 
 function OtherFeature() {
   return (
@@ -35,10 +36,9 @@ function OtherFeature() {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-3">
-          <AccordionTrigger>Is it animated?</AccordionTrigger>
+          <AccordionTrigger>TXID</AccordionTrigger>
           <AccordionContent>
-            Yes. It&apos;s animated by default, but you can disable it if you
-            prefer.
+            <TxidForm />
           </AccordionContent>
         </AccordionItem>
       </Accordion>
