@@ -23,7 +23,7 @@ function generateAddress(
 }
 
 // Function to generate legacy address (P2PKH and P2SH)
-function generateLegacyAddress(
+export function generateLegacyAddress(
   publicKeyHash: string,
   versionByte: number
 ): string {
@@ -52,7 +52,7 @@ function generateLegacyAddress(
 }
 
 // Function to convert public key hash to Bech32 address
-function convertToBech32(
+export function convertToBech32(
   publicKeyHash: string,
   witnessVersion: number
 ): string {

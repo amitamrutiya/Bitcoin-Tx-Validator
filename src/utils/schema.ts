@@ -87,6 +87,11 @@ export const scriptSchema = z.object({
   asm: z.string().min(2, "Script cannot be empty"),
 });
 
+export const bash58Schema = z.object({
+  prefix: z.enum(["00", "05", "6f", "c4"]),
+  hash: z.string().min(2),
+});
+
 export type TransactionInputSchema = z.infer<typeof inputSchema>;
 
 export type TransactionOutputSchema = z.infer<typeof outputSchema>;
@@ -98,6 +103,8 @@ export type MerkleRootSchema = z.infer<typeof merkleRootSchema>;
 export type TxidSchema = z.infer<typeof txidSchema>;
 
 export type ScriptSchema = z.infer<typeof scriptSchema>;
+
+export type Base58Schema = z.infer<typeof bash58Schema>;
 
 export const inputDefaultValues: TransactionInputSchema = {
   txid: "a".repeat(64),
