@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import Base58 from "./_components/Base58";
 import Bech32 from "./_components/Bech32";
 import Hash256 from "./_components/Hash256";
+import Hash160 from "./_components/Hash160";
 
 function OtherFeature() {
   const router = useRouter();
@@ -79,6 +80,12 @@ function OtherFeature() {
           <AccordionTrigger>Hash256</AccordionTrigger>
           <AccordionContent>
             <Hash256 />
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-9">
+          <AccordionTrigger>Hash160</AccordionTrigger>
+          <AccordionContent>
+            <Hash160 />
           </AccordionContent>
         </AccordionItem>
       </Accordion>

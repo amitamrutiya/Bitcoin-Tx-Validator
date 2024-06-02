@@ -1,7 +1,7 @@
 import { AddressSchema, addressSchema } from "@/utils/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
-import { useForm, UseFormReturn, useWatch } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -33,7 +33,6 @@ function Bech32() {
     },
   });
 
-  const { watch } = form;
   return (
     <div className="bg-secondary border-b-blue-500 border rounded-lg p-4 flex flex-col">
       <p className="text-md">

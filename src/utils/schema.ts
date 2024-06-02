@@ -84,12 +84,16 @@ export const txidSchema = z.object({
 });
 
 export const scriptSchema = z.object({
-  asm: z.string().min(2, "Script cannot be empty"),
+  asm: z.string().min(1, "Script cannot be empty"),
 });
 
 export const addressSchema = z.object({
   prefix: z.enum(["00", "05", "6f", "c4"]),
-  hash: z.string().min(2),
+  hash: z.string().min(1, "Hash cannot be empty"),
+});
+
+export const hashSchema = z.object({
+  hash: z.string().min(1, "Hash cannot be empty"),
 });
 
 export type TransactionInputSchema = z.infer<typeof inputSchema>;
@@ -105,6 +109,8 @@ export type TxidSchema = z.infer<typeof txidSchema>;
 export type ScriptSchema = z.infer<typeof scriptSchema>;
 
 export type AddressSchema = z.infer<typeof addressSchema>;
+
+export type HashSchema = z.infer<typeof hashSchema>;
 
 export const inputDefaultValues: TransactionInputSchema = {
   txid: "a".repeat(64),
