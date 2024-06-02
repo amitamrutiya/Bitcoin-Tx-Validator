@@ -65,11 +65,19 @@ export const transactionSchema = z.object({
   ),
 });
 
+export const merkleRootSchema = z.object({
+  txids: z.array(
+    z.string().length(64, "Txid must be exactly 64 characters long")
+  ),
+});
+
 export type TransactionInputSchema = z.infer<typeof inputSchema>;
 
 export type TransactionOutputSchema = z.infer<typeof outputSchema>;
 
 export type TransactionSchema = z.infer<typeof transactionSchema>;
+
+export type MerkleRootSchema = z.infer<typeof merkleRootSchema>;
 
 export const inputDefaultValues: TransactionInputSchema = {
   txid: "a".repeat(64),
@@ -85,7 +93,7 @@ export const inputDefaultValues: TransactionInputSchema = {
     scriptpubkey_type: "Non-Standard",
     value: 0,
     scriptpubkey: "",
-    scriptpubkey_address: ""
+    scriptpubkey_address: "",
   },
 };
 
