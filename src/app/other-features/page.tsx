@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeftCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Base58 from "./_components/Base58";
+import Bech32 from "./_components/Bech32";
+import Hash256 from "./_components/Hash256";
 
 function OtherFeature() {
   const router = useRouter();
@@ -65,6 +67,18 @@ function OtherFeature() {
           <AccordionTrigger>Address (Base58)</AccordionTrigger>
           <AccordionContent>
             <Base58 />
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-7">
+          <AccordionTrigger>Address (Bech32)</AccordionTrigger>
+          <AccordionContent>
+            <Bech32 />
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-8">
+          <AccordionTrigger>Hash256</AccordionTrigger>
+          <AccordionContent>
+            <Hash256 />
           </AccordionContent>
         </AccordionItem>
       </Accordion>

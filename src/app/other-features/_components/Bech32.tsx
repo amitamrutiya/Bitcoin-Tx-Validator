@@ -14,18 +14,14 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { generateLegacyAddress } from "@/service/verifyAddress";
+import { convertToBech32 } from "@/service/verifyAddress";
 
-function Base58() {
+function Bech32() {
   const [address, setAddress] = useState<string>("");
 
   async function onSubmit(values: AddressSchema) {
-    const base58address = generateLegacyAddress(
-      values.hash,
-      parseInt(values.prefix, 16)
-    );
-
-    setAddress(base58address);
+    const bech32address = convertToBech32(values.hash, 0);
+    setAddress(bech32address);
   }
 
   const form: UseFormReturn<AddressSchema> = useForm<AddressSchema>({
@@ -41,7 +37,7 @@ function Base58() {
   return (
     <div className="bg-secondary border-b-blue-500 border rounded-lg p-4 flex flex-col">
       <p className="text-md">
-        Encode the hash160 of public key or script to a legacy address.
+        Encode the locking script for a P2WPKH or a P2WSH to a segwit address.
       </p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
@@ -60,41 +56,16 @@ function Base58() {
                       <FormControl>
                         <RadioGroupItem value="00" />
                       </FormControl>
-                      <FormLabel className="font-normal">P2PKH</FormLabel>
+                      <FormLabel className="font-normal">P2WPKH</FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
                         <RadioGroupItem value="05" />
                       </FormControl>
-                      <FormLabel className="font-normal">P2SH</FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="6f" />
-                      </FormControl>
-                      <FormLabel className="font-normal">
-                        P2PKH (Testnet)
-                      </FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="c4" />
-                      </FormControl>
-                      <FormLabel className="font-normal">
-                        P2SH (Testnet)
-                      </FormLabel>
+                      <FormLabel className="font-normal">P2WSH</FormLabel>
                     </FormItem>
                   </RadioGroup>
                 </FormControl>
-                <div className="flex gap-4 items-center">
-                  <FormLabel>Prefix</FormLabel>
-                  <Input
-                    {...field}
-                    className="w-11"
-                    value={watch("prefix")}
-                    readOnly
-                  />
-                </div>
                 <FormMessage />
               </FormItem>
             )}
@@ -127,4 +98,4 @@ function Base58() {
   );
 }
 
-export default Base58;
+export default Bech32;
