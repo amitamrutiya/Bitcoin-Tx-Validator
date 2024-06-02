@@ -24,6 +24,7 @@ import SignVerificationForm from "./_components/SignVerificationForm";
 import ReverseByteForm from "./_components/ReverseByteForm";
 import LittleIndianForm from "./_components/LittleIndianForm";
 import UnixTimeForm from "./_components/UnixTimeForm";
+import ParseDerForm from "./_components/ParseDerForm";
 
 function OtherFeature() {
   const router = useRouter();
@@ -113,18 +114,24 @@ function OtherFeature() {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-13">
+          <AccordionTrigger>DER Signature</AccordionTrigger>
+          <AccordionContent>
+            <ParseDerForm />
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-14">
           <AccordionTrigger>Reverse Byte</AccordionTrigger>
           <AccordionContent>
             <ReverseByteForm />
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="item-14">
+        <AccordionItem value="item-15">
           <AccordionTrigger>Little Indian</AccordionTrigger>
           <AccordionContent>
             <LittleIndianForm />
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="item-15">
+        <AccordionItem value="item-16">
           <AccordionTrigger>Unix Time</AccordionTrigger>
           <AccordionContent>
             <UnixTimeForm />

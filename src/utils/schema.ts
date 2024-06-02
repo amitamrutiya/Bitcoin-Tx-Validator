@@ -102,6 +102,10 @@ export const signatureSchema = z.object({
   publicKey: z.string().min(1, "Public key cannot be empty"),
 });
 
+export const parseDerSchema = z.object({
+  signature: z.string().min(1, "Signature cannot be empty"),
+});
+
 export const reverseBytesSchema = z.object({
   bytes: z.string().min(1, "Bytes cannot be empty"),
 });
@@ -137,6 +141,8 @@ export type ReverseBytesSchema = z.infer<typeof reverseBytesSchema>;
 export type LittleIndianSchema = z.infer<typeof littleIndianSchema>;
 
 export type UnixTimeSchema = z.infer<typeof unixTimeSchema>;
+
+export type ParseDerSchema = z.infer<typeof parseDerSchema>;
 
 export const inputDefaultValues: TransactionInputSchema = {
   txid: "a".repeat(64),

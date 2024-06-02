@@ -189,3 +189,22 @@ export function toLittleEndian(decimal: bigint) {
   }
   return buffer.toString("hex");
 }
+
+export function parseDer(signature: string) {
+  const signatureBuffer = Buffer.from(signature, "hex");
+  let rStart = 4;
+  const rLength = signatureBuffer[3];
+
+  const r = BigInt(
+    "0x" + signatureBuffer.slice(rStart, rStart + rLength).toString("hex")
+  );
+  let sStart = rStart + 2 + rLength;
+
+  const sLength = signatureBuffer[rStart + 1 + rLength];
+
+  const s = BigInt(
+    "0x" + signatureBuffer.slice(sStart, sStart + sLength).toString("hex")
+  );
+
+  return { r, s };
+}
