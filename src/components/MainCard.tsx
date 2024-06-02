@@ -26,14 +26,14 @@ function MainCard() {
     TransactionDefaultValues,
   ]);
 
-  function handleAddTransaction() {
+  function onaddTransaction() {
     setAllTransactions((prevTransactions: TransactionSchema[]) => [
       TransactionDefaultValues,
       ...prevTransactions,
     ]);
   }
 
-  async function getRandomTransaction(): Promise<void> {
+  async function onRandomTransaction(): Promise<void> {
     let transactionNumber = 1;
 
     if (!validateTransaction) {
@@ -45,7 +45,6 @@ function MainCard() {
       const response = await fetch("/api/randomTransaction", {
         cache: "no-store",
       });
-
       const newTransaction = await response.json();
       if (validateTransaction) setAllTransactions([]);
 
@@ -146,7 +145,7 @@ function MainCard() {
           <Button
             type="submit"
             className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md hover:text-primary-foregound bg-primary transform transition duration-300 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            onClick={getRandomTransaction}
+            onClick={onRandomTransaction}
           >
             Random Example
           </Button>
@@ -160,11 +159,7 @@ function MainCard() {
         ))}
 
         {!validateTransaction && (
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleAddTransaction}
-          >
+          <Button type="button" variant="secondary" onClick={onaddTransaction}>
             Add Transaction
           </Button>
         )}

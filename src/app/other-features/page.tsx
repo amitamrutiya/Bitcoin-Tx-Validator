@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import {
   Accordion,
   AccordionContent,
@@ -12,14 +11,22 @@ import { TransactionDefaultValues } from "@/utils/schema";
 import MerkelRootForm from "./_components/MerkelRootForm";
 import TxidForm from "./_components/TxidForm";
 import ScriptForm from "./_components/ScriptForm";
+import { Button } from "@/components/ui/button";
+import { ChevronLeftCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Base58 from "./_components/Base58";
 
 function OtherFeature() {
+  const router = useRouter();
   return (
-    <div className="min-h-screen flex justify-center items-center text-white w-screen">
+    <div className="min-h-screen flex flex-col justify-center items-center text-white w-screen gap-8">
+      <Button className="gap-2" onClick={() => router.back()}>
+        <ChevronLeftCircle /> GO Back
+      </Button>
       <Accordion
         type="single"
         collapsible
-        className="w-2/3 border p-5 rounded-md"
+        className="max-w-[800px] w-2/3 border p-5 rounded-md"
       >
         <AccordionItem value="item-1">
           <AccordionTrigger>Serialize transaction</AccordionTrigger>
@@ -52,6 +59,12 @@ function OtherFeature() {
           <AccordionTrigger>Script</AccordionTrigger>
           <AccordionContent>
             <ScriptForm />
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-6">
+          <AccordionTrigger>Address (Base58)</AccordionTrigger>
+          <AccordionContent>
+            <Base58 />
           </AccordionContent>
         </AccordionItem>
       </Accordion>
