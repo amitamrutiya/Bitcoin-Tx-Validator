@@ -18,6 +18,8 @@ import Base58 from "./_components/Base58";
 import Bech32 from "./_components/Bech32";
 import Hash256 from "./_components/Hash256";
 import Hash160 from "./_components/Hash160";
+import Sha256 from "./_components/Sha256Form";
+import Rimped160 from "./_components/Rimped160Form";
 
 function OtherFeature() {
   const router = useRouter();
@@ -86,6 +88,18 @@ function OtherFeature() {
           <AccordionTrigger>Hash160</AccordionTrigger>
           <AccordionContent>
             <Hash160 />
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-10">
+          <AccordionTrigger>SHA256</AccordionTrigger>
+          <AccordionContent>
+            <Sha256 />
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-11">
+          <AccordionTrigger>Rimped160</AccordionTrigger>
+          <AccordionContent>
+            <Rimped160 />
           </AccordionContent>
         </AccordionItem>
       </Accordion>

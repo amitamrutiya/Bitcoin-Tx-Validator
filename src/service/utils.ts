@@ -113,7 +113,7 @@ export function sha256(inputHex: string): string {
   return bufferToHex(new Uint8Array(hashBuffer));
 }
 
-function ripemd(inputHex: string): string {
+export function ripemd(inputHex: string): string {
   const hash = crypto
     .createHash("ripemd160")
     .update(Buffer.from(inputHex, "hex"))
