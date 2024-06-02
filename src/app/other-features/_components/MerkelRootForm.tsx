@@ -1,4 +1,3 @@
-
 import { getMerkeRoot } from "@/actions/getMerkelRoot";
 import { Button } from "@/components/ui/button";
 import {
@@ -59,7 +58,7 @@ function MerkelRootForm() {
                   <br />
                   The TXIDs should be input in reverse byte order (as they
                   appear on blockchain explorers), but they are converted to
-                  natural byte order before the merkle root is calculated.{" "}
+                  natural byte order before the merkle root is calculated.
                 </FormMessage>
               </FormItem>
             )}

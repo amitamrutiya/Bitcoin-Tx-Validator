@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toLittleEndian } from "@/service/utils";
+import { reverseBytes } from "@/service/utils";
 import { ReverseBytesSchema, reverseBytesSchema } from "@/utils/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
@@ -26,7 +26,7 @@ function ReverseByteForm() {
   });
 
   function onSubmit(data: ReverseBytesSchema) {
-    const returnByte = toLittleEndian(data.bytes);
+    const returnByte = reverseBytes(data.bytes);
     setByte(returnByte);
   }
   return (

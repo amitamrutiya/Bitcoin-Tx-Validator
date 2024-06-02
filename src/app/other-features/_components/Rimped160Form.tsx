@@ -33,7 +33,7 @@ function Rimped160() {
   return (
     <div className="bg-secondary border-b-blue-500 border rounded-lg p-4 flex flex-col space-y-2">
       <p className="text-md">
-        RIPEMD-160. Hash bytes of data using the RIPEMD-160 hash function.{" "}
+        RIPEMD-160. Hash bytes of data using the RIPEMD-160 hash function.
       </p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
