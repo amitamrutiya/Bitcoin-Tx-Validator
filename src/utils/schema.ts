@@ -110,6 +110,10 @@ export const littleIndianSchema = z.object({
   num: z.string().min(1, "Number cannot be empty"),
 });
 
+export const unixTimeSchema = z.object({
+  unixTime: z.coerce.number().int().min(0),
+});
+
 export type TransactionInputSchema = z.infer<typeof inputSchema>;
 
 export type TransactionOutputSchema = z.infer<typeof outputSchema>;
@@ -131,6 +135,8 @@ export type SignatureSchema = z.infer<typeof signatureSchema>;
 export type ReverseBytesSchema = z.infer<typeof reverseBytesSchema>;
 
 export type LittleIndianSchema = z.infer<typeof littleIndianSchema>;
+
+export type UnixTimeSchema = z.infer<typeof unixTimeSchema>;
 
 export const inputDefaultValues: TransactionInputSchema = {
   txid: "a".repeat(64),
