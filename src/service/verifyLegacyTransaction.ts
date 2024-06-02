@@ -28,7 +28,7 @@ export default function verifyLegacyTransaction(
       const hashResult = hash256Buffer(serializedWithSighash);
       const result = verifySignature(
         hashResult.toString("hex"),
-        signature,
+        signature.slice(0, -2),
         publicKey
       );
       if (result) {

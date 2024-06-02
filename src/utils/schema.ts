@@ -96,6 +96,20 @@ export const hashSchema = z.object({
   hash: z.string().min(1, "Hash cannot be empty"),
 });
 
+export const signatureSchema = z.object({
+  message: z.string().min(1, "Message cannot be empty"),
+  signature: z.string().min(1, "Signature cannot be empty"),
+  publicKey: z.string().min(1, "Public key cannot be empty"),
+});
+
+export const reverseBytesSchema = z.object({
+  bytes: z.string().min(1, "Bytes cannot be empty"),
+});
+
+export const littleIndianSchema = z.object({
+  num: z.string().min(1, "Number cannot be empty"),
+});
+
 export type TransactionInputSchema = z.infer<typeof inputSchema>;
 
 export type TransactionOutputSchema = z.infer<typeof outputSchema>;
@@ -111,6 +125,12 @@ export type ScriptSchema = z.infer<typeof scriptSchema>;
 export type AddressSchema = z.infer<typeof addressSchema>;
 
 export type HashSchema = z.infer<typeof hashSchema>;
+
+export type SignatureSchema = z.infer<typeof signatureSchema>;
+
+export type ReverseBytesSchema = z.infer<typeof reverseBytesSchema>;
+
+export type LittleIndianSchema = z.infer<typeof littleIndianSchema>;
 
 export const inputDefaultValues: TransactionInputSchema = {
   txid: "a".repeat(64),

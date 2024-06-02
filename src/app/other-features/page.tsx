@@ -14,12 +14,16 @@ import ScriptForm from "./_components/ScriptForm";
 import { Button } from "@/components/ui/button";
 import { ChevronLeftCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Base58 from "./_components/Base58";
-import Bech32 from "./_components/Bech32";
-import Hash256 from "./_components/Hash256";
-import Hash160 from "./_components/Hash160";
+import Base58 from "./_components/Base58Form";
+import Bech32 from "./_components/Bech32Form";
+import Hash256 from "./_components/Hash256Form";
+import Hash160 from "./_components/Hash160Form";
 import Sha256 from "./_components/Sha256Form";
 import Rimped160 from "./_components/Rimped160Form";
+import SignVerificationForm from "./_components/SignVerificationForm";
+import ReverseByteForm from "./_components/ReverseByteForm";
+import LittleIndianForm from "./_components/LittleIndianForm";
+import UnixTimeForm from "./_components/UnixTimeForm";
 
 function OtherFeature() {
   const router = useRouter();
@@ -100,6 +104,30 @@ function OtherFeature() {
           <AccordionTrigger>Rimped160</AccordionTrigger>
           <AccordionContent>
             <Rimped160 />
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-12">
+          <AccordionTrigger>Signature Verification</AccordionTrigger>
+          <AccordionContent>
+            <SignVerificationForm />
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-13">
+          <AccordionTrigger>Reverse Byte</AccordionTrigger>
+          <AccordionContent>
+            <ReverseByteForm />
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-14">
+          <AccordionTrigger>Little Indian</AccordionTrigger>
+          <AccordionContent>
+            <LittleIndianForm />
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-15">
+          <AccordionTrigger>Unix Time</AccordionTrigger>
+          <AccordionContent>
+            <UnixTimeForm />
           </AccordionContent>
         </AccordionItem>
       </Accordion>

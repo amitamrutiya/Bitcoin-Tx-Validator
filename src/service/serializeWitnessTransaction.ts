@@ -1,10 +1,10 @@
 import { TransactionSchema } from "@/utils/schema";
-import { toLittleEndian, serializeVarInt } from "./utils";
+import { reverseBytes, serializeVarInt } from "./utils";
 
 // Function to serialize a witness transaction
 export function serializeWitnessTransaction(tx: TransactionSchema): string {
   // Convert version to little endian format
-  let version = toLittleEndian(tx.version.toString(16).padStart(8, "0"));
+  let version = reverseBytes(tx.version.toString(16).padStart(8, "0"));
 
   // Check if the transaction is SegWit
   const isSegwit = tx.vin.some((input) => input.witness !== undefined);
@@ -19,7 +19,7 @@ export function serializeWitnessTransaction(tx: TransactionSchema): string {
   }
 
   // Convert locktime to little endian format
-  let locktime = toLittleEndian(tx.locktime.toString(16).padStart(8, "0"));
+  let locktime = reverseBytes(tx.locktime.toString(16).padStart(8, "0"));
 
   // Serialize the number of inputs and outputs
   let vinCount = serializeVarInt(tx.vin.length).toString("hex");
@@ -28,8 +28,8 @@ export function serializeWitnessTransaction(tx: TransactionSchema): string {
   // Serialize each input
   let vin = tx.vin
     .map((input) => {
-      let txid = toLittleEndian(input.txid);
-      let vout = toLittleEndian(input.vout.toString(16).padStart(8, "0"));
+      let txid = reverseBytes(input.txid);
+      let vout = reverseBytes(input.vout.toString(16).padStart(8, "0"));
       let scriptSig;
       if (input.scriptsig) {
         scriptSig =
@@ -38,7 +38,7 @@ export function serializeWitnessTransaction(tx: TransactionSchema): string {
       } else {
         scriptSig = "00";
       }
-      let sequence = toLittleEndian(
+      let sequence = reverseBytes(
         input.sequence.toString(16).padStart(8, "0")
       );
       return txid + vout + scriptSig + sequence;
@@ -48,7 +48,7 @@ export function serializeWitnessTransaction(tx: TransactionSchema): string {
   // Serialize each output
   let vout = tx.vout
     .map((output) => {
-      let value = toLittleEndian(output.value.toString(16).padStart(16, "0"));
+      let value = reverseBytes(output.value.toString(16).padStart(16, "0"));
       let scriptPubKey =
         serializeVarInt(output.scriptpubkey!.length / 2).toString("hex") +
         output.scriptpubkey;

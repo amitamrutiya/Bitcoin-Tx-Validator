@@ -1,11 +1,11 @@
 import { TransactionSchema } from "@/utils/schema";
-import { toLittleEndian, serializeVarInt } from "./utils";
+import { reverseBytes, serializeVarInt } from "./utils";
 
 // Function to serialize a transaction
 export function serializeTransaction(tx: TransactionSchema): string {
   // Convert version and locktime to little endian format
-  let version = toLittleEndian(tx.version.toString(16).padStart(8, "0"));
-  let locktime = toLittleEndian(tx.locktime.toString(16).padStart(8, "0"));
+  let version = reverseBytes(tx.version.toString(16).padStart(8, "0"));
+  let locktime = reverseBytes(tx.locktime.toString(16).padStart(8, "0"));
 
   // Serialize the number of inputs and outputs
   let vinCount = serializeVarInt(tx.vin.length).toString("hex");
@@ -14,8 +14,8 @@ export function serializeTransaction(tx: TransactionSchema): string {
   // Serialize each input
   let vin = tx.vin
     .map((input) => {
-      let txid = toLittleEndian(input.txid);
-      let vout = toLittleEndian(input.vout.toString(16).padStart(8, "0"));
+      let txid = reverseBytes(input.txid);
+      let vout = reverseBytes(input.vout.toString(16).padStart(8, "0"));
       let scriptSig;
       // If scriptsig exists, serialize it
       if (input.scriptsig) {
@@ -25,7 +25,7 @@ export function serializeTransaction(tx: TransactionSchema): string {
       } else {
         scriptSig = "00";
       }
-      let sequence = toLittleEndian(
+      let sequence = reverseBytes(
         input.sequence.toString(16).padStart(8, "0")
       );
       // Return the serialized input
@@ -36,7 +36,7 @@ export function serializeTransaction(tx: TransactionSchema): string {
   // Serialize each output
   let vout = tx.vout
     .map((output) => {
-      let value = toLittleEndian(output.value.toString(16).padStart(16, "0"));
+      let value = reverseBytes(output.value.toString(16).padStart(16, "0"));
       let scriptPubKey =
         serializeVarInt(output.scriptpubkey!.length / 2).toString("hex") +
         output.scriptpubkey;

@@ -1,5 +1,5 @@
 import { TransactionSchema } from "@/utils/schema";
-import { createMerkleRoot, toLittleEndian, hash256 } from "./utils";
+import { createMerkleRoot, reverseBytes, hash256 } from "./utils";
 
 // Converts the target difficulty into bits for the block header
 function targetToBits(target: string): string {
@@ -56,17 +56,17 @@ export function createBlockHeader(transactions: TransactionSchema[]): string {
 
   // Create the block header
   let header =
-    toLittleEndian(field(parseInt(version), 4)) +
-    toLittleEndian(prevblock) +
+    reverseBytes(field(parseInt(version), 4)) +
+    reverseBytes(prevblock) +
     merkleroot +
-    toLittleEndian(field(time, 4)) +
-    toLittleEndian(bits);
+    reverseBytes(field(time, 4)) +
+    reverseBytes(bits);
 
   // Start mining the block
   while (true) {
     // Hash the block header with the current nonce
-    const attempt = header + toLittleEndian(field(nonce, 4));
-    const result = toLittleEndian(hash256(attempt));
+    const attempt = header + reverseBytes(field(nonce, 4));
+    const result = reverseBytes(hash256(attempt));
 
     // If the hash is less than the target, the block has been successfully mined
     if (BigInt("0x" + result) < BigInt("0x" + target)) {
@@ -77,7 +77,7 @@ export function createBlockHeader(transactions: TransactionSchema[]): string {
     nonce++;
   }
   // Add the successful nonce to the block header
-  header = header + toLittleEndian(field(nonce, 4));
+  header = header + reverseBytes(field(nonce, 4));
   // Return the block header
   return header;
 }

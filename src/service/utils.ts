@@ -3,12 +3,6 @@ import pkg from "elliptic";
 const { ec: EC } = pkg;
 const ec = new EC("secp256k1");
 
-export function serializeUInt32LE(value: number): Buffer {
-  const buffer = Buffer.alloc(4);
-  buffer.writeUInt32LE(value, 0);
-  return buffer;
-}
-
 export function hash256Buffer(buffer: Buffer): Buffer {
   const hash1 = crypto.createHash("sha256").update(buffer).digest();
   const hash2 = crypto.createHash("sha256").update(hash1).digest();
@@ -40,6 +34,12 @@ export function serializeUInt16LE(value: number): Buffer {
   return buffer;
 }
 
+export function serializeUInt32LE(value: number): Buffer {
+  const buffer = Buffer.alloc(4);
+  buffer.writeUInt32LE(value, 0);
+  return buffer;
+}
+
 export function serializeUInt64LE(value: number | bigint): Buffer {
   const buffer = Buffer.alloc(8);
   buffer.writeBigUInt64LE(BigInt(value), 0);
@@ -58,7 +58,7 @@ export function verifySignature(
   publicKeyHex: string
 ): boolean {
   try {
-    const signature = Buffer.from(signatureHex.slice(0, -2), "hex");
+    const signature = Buffer.from(signatureHex, "hex");
     const message = Buffer.from(transactionDigestHex, "hex");
     const publicKey = ec.keyFromPublic(publicKeyHex, "hex");
     const result = publicKey.verify(message, signature);
@@ -163,6 +163,29 @@ export function createMerkleRoot(txids: string[]): string | null {
 }
 
 // Reverse the order of bytes (often happens when working with raw bitcoin data)
-export function toLittleEndian(hex: string): string {
+export function reverseBytes(hex: string): string {
   return Buffer.from(hex, "hex").reverse().toString("hex");
+}
+
+export function toBigEndian(decimal: bigint) {
+  const fieldSize = Math.ceil(Math.log2(Number(decimal) + 1) / 8);
+  console.log(fieldSize);
+  const buffer = Buffer.alloc(fieldSize);
+  if (fieldSize <= 6) {
+    buffer.writeUIntBE(Number(decimal), 0, fieldSize);
+  } else if (fieldSize === 8) {
+    buffer.writeBigUInt64BE(decimal);
+  }
+  return buffer.toString("hex");
+}
+
+export function toLittleEndian(decimal: bigint) {
+  const fieldSize = Math.ceil(Math.log2(Number(decimal) + 1) / 8);
+  const buffer = Buffer.alloc(fieldSize);
+  if (fieldSize <= 6) {
+    buffer.writeUIntLE(Number(decimal), 0, fieldSize);
+  } else if (fieldSize === 8) {
+    buffer.writeBigUInt64LE(decimal);
+  }
+  return buffer.toString("hex");
 }
