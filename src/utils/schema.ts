@@ -83,6 +83,10 @@ export const txidSchema = z.object({
   }),
 });
 
+export const scriptSchema = z.object({
+  asm: z.string().min(2, "Script cannot be empty"),
+});
+
 export type TransactionInputSchema = z.infer<typeof inputSchema>;
 
 export type TransactionOutputSchema = z.infer<typeof outputSchema>;
@@ -92,6 +96,8 @@ export type TransactionSchema = z.infer<typeof transactionSchema>;
 export type MerkleRootSchema = z.infer<typeof merkleRootSchema>;
 
 export type TxidSchema = z.infer<typeof txidSchema>;
+
+export type ScriptSchema = z.infer<typeof scriptSchema>;
 
 export const inputDefaultValues: TransactionInputSchema = {
   txid: "a".repeat(64),

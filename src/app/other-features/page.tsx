@@ -11,6 +11,7 @@ import { TransactionForm } from "@/components/TransactionForm";
 import { TransactionDefaultValues } from "@/utils/schema";
 import MerkelRootForm from "./_components/MerkelRootForm";
 import TxidForm from "./_components/TxidForm";
+import ScriptForm from "./_components/ScriptForm";
 
 function OtherFeature() {
   return (
@@ -38,13 +39,19 @@ function OtherFeature() {
         <AccordionItem value="item-3">
           <AccordionTrigger>TXID</AccordionTrigger>
           <AccordionContent>
-            <TxidForm type={"txid"}/>
+            <TxidForm type={"txid"} />
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-4">
           <AccordionTrigger>wTXID</AccordionTrigger>
           <AccordionContent>
             <TxidForm type={"wtxid"} />
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-5">
+          <AccordionTrigger>Script</AccordionTrigger>
+          <AccordionContent>
+            <ScriptForm />
           </AccordionContent>
         </AccordionItem>
       </Accordion>
