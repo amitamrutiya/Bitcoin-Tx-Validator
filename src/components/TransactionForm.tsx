@@ -30,11 +30,13 @@ import {
 type TransactionFormProps = {
   defaultValues: TransactionSchema | null;
   checkValid: boolean;
+  loading: boolean;
 };
 
 export function TransactionForm({
   defaultValues,
   checkValid,
+  loading,
 }: TransactionFormProps) {
   const form: UseFormReturn<TransactionSchema> = useForm<TransactionSchema>({
     mode: "all",
@@ -117,7 +119,7 @@ export function TransactionForm({
       </AlertDialog>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2" >
           <TransactionTypeField setIsSegwit={setIsSegwit} isSegwit={isSegwit} />
           <TransactionVersionField form={form} />
           {isSegwit && <TransactionMarkerFlag form={form} />}
@@ -133,7 +135,7 @@ export function TransactionForm({
             setOutputsNumber={setOutputsNumber}
           />
           <LocktimeField form={form} />
-          <Button type="submit">Submit</Button>
+          <Button type="submit" disabled={loading}>Submit</Button>
         </form>
       </Form>
       <Separator className="bg-primary my-4" />

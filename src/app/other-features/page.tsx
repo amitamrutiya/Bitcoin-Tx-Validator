@@ -44,6 +44,7 @@ function OtherFeature() {
             <TransactionForm
               defaultValues={TransactionDefaultValues}
               checkValid={false}
+              loading={false}
             />
           </AccordionContent>
         </AccordionItem>

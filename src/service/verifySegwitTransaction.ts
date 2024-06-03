@@ -118,11 +118,14 @@ function serializeScriptCode(input: TransactionInputSchema): Buffer {
   ]);
 }
 
-function hashPrevouts(transaction: any, anyOneCanPayFlag: boolean): Buffer {
+function hashPrevouts(
+  transaction: TransactionSchema,
+  anyOneCanPayFlag: boolean
+): Buffer {
   if (transaction.vin[0].is_coinbase || anyOneCanPayFlag) {
     return Buffer.alloc(32);
   } else {
-    const outpoints = transaction.vin.map((input: any) =>
+    const outpoints = transaction.vin.map((input: TransactionInputSchema) =>
       serializeOutpoint(input)
     );
     const buffer = Buffer.concat(outpoints);

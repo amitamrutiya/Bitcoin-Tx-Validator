@@ -25,6 +25,7 @@ function MainCard() {
   const [allTransactions, setAllTransactions] = useState<TransactionSchema[]>([
     TransactionDefaultValues,
   ]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   function onaddTransaction() {
     setAllTransactions((prevTransactions: TransactionSchema[]) => [
@@ -34,6 +35,8 @@ function MainCard() {
   }
 
   async function onRandomTransaction(): Promise<void> {
+    setLoading(true);
+    setAllTransactions([]);
     let transactionNumber = 1;
 
     if (!validateTransaction) {
@@ -46,25 +49,26 @@ function MainCard() {
         cache: "no-store",
       });
       const newTransaction = await response.json();
-      if (validateTransaction) setAllTransactions([]);
 
       setAllTransactions((prevTransactions: TransactionSchema[]) => [
-        newTransaction,
         ...prevTransactions,
+        newTransaction,
       ]);
     }
+    setLoading(false);
   }
 
   async function handleMineBlock(): Promise<void> {
     try {
+      setLoading(true);
       const minedBlock = await mineTransaction(allTransactions);
       setMinedBlock(minedBlock);
     } catch (error) {
       setMinedBlock(undefined);
     } finally {
       setOpen(true);
+      setLoading(false);
     }
-    setOpen(true);
   }
 
   return (
@@ -146,6 +150,7 @@ function MainCard() {
             type="submit"
             className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md hover:text-primary-foregound bg-primary transform transition duration-300 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             onClick={onRandomTransaction}
+            disabled={loading}
           >
             Random Example
           </Button>
@@ -153,8 +158,9 @@ function MainCard() {
         {allTransactions.map((tx) => (
           <TransactionForm
             key={tx.TxId}
-            defaultValues={tx!}
+            defaultValues={tx ?? TransactionDefaultValues}
             checkValid={true}
+            loading={loading}
           />
         ))}
 

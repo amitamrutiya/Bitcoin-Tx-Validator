@@ -29,7 +29,6 @@ function SignVerificationForm() {
   });
 
   async function onSubmit(values: SignatureSchema) {
-    console.log(values);
     const result = verifySignature(
       values.message,
       values.signature,
