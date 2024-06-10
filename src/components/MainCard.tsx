@@ -39,6 +39,7 @@ function MainCard() {
     setLoading(true);
     setAllTransactions([]);
     let transactionNumber = 1;
+    let newTransactionList: TransactionSchema[] = [];
 
     if (!validateTransaction) {
       // transaction Number between 5 to 10
@@ -47,11 +48,12 @@ function MainCard() {
 
     for (let i = 0; i < transactionNumber; i++) {
       const newTransaction = await getRandomTransaction();
-      setAllTransactions((prevTransactions: TransactionSchema[]) => [
-        ...prevTransactions,
-        newTransaction,
-      ]);
+      newTransactionList.push(newTransaction);
     }
+    setAllTransactions((prevTransactions: TransactionSchema[]) => [
+      ...prevTransactions,
+      ...newTransactionList,
+    ]);
     setLoading(false);
   }
 
@@ -110,13 +112,19 @@ function MainCard() {
         <div className="flex gap-5">
           <Button
             variant={validateTransaction ? "default" : "secondary"}
-            onClick={() => setValidateTransaction(true)}
+            onClick={() => {
+              setAllTransactions([]);
+              setValidateTransaction(true);
+            }}
             className={`p-3 rounded-lg transform transition duration-300 ease-in-out hover:scale-110 `}
           >
             Validate Transaction
           </Button>
           <Button
-            onClick={() => setValidateTransaction(false)}
+            onClick={() => {
+              setAllTransactions([]);
+              setValidateTransaction(false);
+            }}
             variant={validateTransaction ? "secondary" : "default"}
             className={` p-3 rounded-lg transform transition duration-300 ease-in-out hover:scale-110`}
           >
@@ -152,14 +160,22 @@ function MainCard() {
             Random Example
           </Button>
         </div>
-        {allTransactions.map((tx) => (
+        {allTransactions.length === 0 ? (
           <TransactionForm
-            key={tx.TxId}
-            defaultValues={tx ?? TransactionDefaultValues}
+            defaultValues={TransactionDefaultValues}
             checkValid={true}
             loading={loading}
           />
-        ))}
+        ) : (
+          allTransactions.map((tx) => (
+            <TransactionForm
+              key={tx.TxId}
+              defaultValues={tx ?? TransactionDefaultValues}
+              checkValid={true}
+              loading={loading}
+            />
+          ))
+        )}
 
         {!validateTransaction && (
           <Button type="button" variant="secondary" onClick={onaddTransaction}>
