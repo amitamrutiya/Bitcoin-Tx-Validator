@@ -16,6 +16,7 @@ import { TransactionDefaultValues, TransactionSchema } from "@/utils/schema";
 import { TransactionForm } from "./TransactionForm";
 import { mineTransaction } from "@/actions/mineTransaction";
 import { useRouter } from "next/navigation";
+import { getRandomTransaction } from "@/actions/getRandomTransaction";
 
 function MainCard() {
   const router = useRouter();
@@ -45,11 +46,7 @@ function MainCard() {
     }
 
     for (let i = 0; i < transactionNumber; i++) {
-      const response = await fetch("/api/randomTransaction", {
-        cache: "no-store",
-      });
-      const newTransaction = await response.json();
-
+      const newTransaction = await getRandomTransaction();
       setAllTransactions((prevTransactions: TransactionSchema[]) => [
         ...prevTransactions,
         newTransaction,

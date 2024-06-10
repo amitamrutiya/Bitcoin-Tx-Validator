@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const outputSchema = z.object({
-  value: z.coerce.number().int().min(1, "Amount must be greater than 0"),
+  value: z.coerce.number().int().min(0, "Amount must be greater than 0"),
   scriptpubkey: z.optional(z.string()),
   scriptpubkey_address: z.string().min(2, "Address cannot be empty"),
   scriptpubkey_asm: z.string().min(2, "ScriptPubKey cannot be empty"),
